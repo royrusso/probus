@@ -4,9 +4,9 @@ import subprocess
 from loguru import logger
 import xmltodict
 import json
-from nmap_utils import is_root
+from .nmap_utils import is_root
 
-class Nmap(object):
+class NmapScanner(object):
     """
     Nmap object to handle nmap scanning. This will be used to scan the target IP address(es) and return the results.
 
@@ -19,12 +19,11 @@ class Nmap(object):
     3. The third pass will be a vulnerability scan to determine which hosts are vulnerable.
     """
 
-    def __init__(self, path=None):
+    def __init__(self):
         self.target = [] # Target IP address(es) to scan
-        self.nmap_path = path if path else self.which_nmap()
         self.scan_type = "ping" # The type of scan to perform
 
-    def which_nmap(self):
+    def which_nmap(self) -> str:
         """Find nmap in the system. We will likely be distributing this as a docker container, so we do have some control over the OS and nmap installation."""
         for path in os.environ["PATH"].split(os.pathsep):
             path = path.strip('"')
@@ -33,7 +32,7 @@ class Nmap(object):
                 return nmap
         return None
 
-    def nmap_version(self):
+    def nmap_version(self) -> str:
         """Get the version of nmap installed on the system."""
         nmap_path = self.which_nmap()
         if nmap_path:
@@ -58,13 +57,13 @@ class Nmap(object):
                 return stdout.decode("utf-8")
         return None
 
-    def get_scan_command(self):
+    def get_scan_command(self) :
         """
         Get the nmap command to run based on the scan type.
 
         HOST DISCOVERY:
         -sn (No port scan)
-        -Pn (No host discovery)
+        -Pn (Port scan only, No host discovery)
         --traceroute (Trace the route to the host)
 
         PORT SPECIFICATION AND TECHNIQUES:
@@ -89,19 +88,54 @@ class Nmap(object):
         """
         nmap_path = self.which_nmap()
         if nmap_path:
-            if self.scan_type == "ping":
-                flags = ["-sn", "-Pn", "--traceroute", "-T4", "-oX", "-"] # No port scan. Yes traceroute
-            elif self.scan_type == "detailed":
-                flags = ["-sS", "--min-rate", "2000", "-oX", "-"] # TCP SYN scan
-            elif self.scan_type == "vuln":
-                flags = ["--script", "vulners", "-sV", "-O","--min-rate", "2000", "-oX", "-"] # Probe open ports to determine service/version info and vuln scan
-
+            match self.scan_type:
+                case "ping":
+                    flags = ["-sn", "--traceroute", "-T4", "-oX", "-", "-v"] # No port scan. Yes traceroute
+                case "detailed":
+                    flags = ["-sS", "--min-rate", "2000", "-oX", "-"] # TCP SYN scan
+                case "os":
+                    flags = ["-Pn", "-O", "-oX", "-"] # Enable OS detection only
+                case "list":
+                    flags = ["-sL", "-oX", "-"] # sudo nmap -sL 192.168.1.200-210
+                case "vuln":
+                    flags = ["--script", "vulners", "-sV", "-O","--min-rate", "2000", "-oX", "-"] # Probe open ports to determine service/version info and vuln scan
+                case _:
+                    flags = ["-sn", "-Pn", "--traceroute", "-T4", "-oX", "-"] # just use ping as the default.
             command = [nmap_path] + flags + [self.target]
             return command
         return None
 
+    def list_scan(self, target: str) -> str:
+        """
+        Given an IP address range, returns the IP addresses in the range. This does NOT check the status, scan, nor ping each IP.
+
+        From the Nmap documentation:
+    
+        https://nmap.org/book/man-host-discovery.html
+    
+        > The list scan is a degenerate form of host discovery that simply lists each host of the network(s) specified, without sending any packets to the target hosts. By default, Nmap still does reverse-DNS resolution on the hosts to learn their names. It is often surprising how much useful information simple hostnames give out. For example, fw.chi is the name of one company's Chicago firewall. Nmap also reports the total number of IP addresses at the end. The list scan is a good sanity check to ensure that you have proper IP addresses for your targets. If the hosts sport domain names you do not recognize, it is worth investigating further to prevent scanning the wrong company's network.
+        Since the idea is to simply print a list of target hosts, options for higher level functionality such as port scanning, OS detection, or host discovery cannot be combined with this. If you wish to disable host discovery while still performing such higher level functionality, read up on the -Pn (skip host discovery) option.
+
+        """
+        self.target = target
+        self.scan_type = "list"
+        return self.__scan()
+
     @is_root
-    def scan(self):
+    def scan(self, target: str, type: str  ) -> str:
+        if ("-" in target) or ("/" in target):
+            logger.error("Target {} must be a single IP address. Use list_scan instead.".format(target))
+            return "Target {} must be a single IP address.".format(target)
+
+        self.target = target
+        self.scan_type = type
+        if not self.target or not self.scan_type:
+            logger.error("Target and scan type must be provided.")
+            return "Target and scan type must be provided."
+        return self.__scan()
+
+    @is_root
+    def __scan(self) -> str:
         """
         Scan the target IP address(es)
         ::NOTE:: This requires root privs, so when running in VSCode Debugger, open the vscode terminal and type: `sudo su` and then run the debugger.
@@ -116,10 +150,11 @@ class Nmap(object):
             stdout, stderr = process.communicate(timeout=30) # TODO: timeout should be configurable
             #logger.info("Scan Results: {}".format(stdout.decode("utf-8")))
             json_stdout_response = json.dumps(xmltodict.parse(stdout.decode("utf-8")), indent=4)
+            
             logger.info("Scan Results: {}".format(json_stdout_response))
             if stderr:
                 logger.error("Scan Errors: {}".format(stderr.decode("utf-8")))
-            return stdout.decode("utf-8")
+            return json.loads(json_stdout_response)
         except subprocess.TimeoutExpired:
             process.kill()
             logger.error("Scan timed out for target: {}".format(self.target))
@@ -129,19 +164,22 @@ class Nmap(object):
             return None
 
 if __name__ == "__main__":
-    nmap = Nmap()
-    nmap.nmap_version()
+    nmap_scanner = NmapScanner()
+    nmap_scanner.nmap_version()
 
     #nmap.target = "192.168.50.140-144"
     #nmap.target = "192.168.20.51-58"
     #nmap.target = "192.168.20.51"
-    nmap.target = "192.168.1.196"
+    #nmap_scanner.target = "192.168.1.196"
     #nmap.target = "192.168.1.180"
-    nmap.scan_type = "ping"
-    nmap.scan()
+    nmap_scanner.scan_type = "ping"
+    nmap_scanner.scan("192.168.1.196", "ping")
 
-    nmap.scan_type = "detailed"
-    nmap.scan()
+    nmap_scanner.scan("192.168.1.196", "detailed")
+
+    nmap_scanner.scan("192.168.1.0/24", "ping")
+
+    nmap_scanner.list_scan("192.168.1.0/24")
 
     # nmap.scan_type = "vuln"
     # nmap.scan()
