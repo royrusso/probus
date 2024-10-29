@@ -1,7 +1,6 @@
 import os
-import errno
 from loguru import logger
-
+  
 def is_root(func):
     """
     Decorator to check if the user is running the script as root.

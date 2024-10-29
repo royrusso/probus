@@ -1,11 +1,9 @@
 
-from fastapi import FastAPI
-from typing import Union
 from fastapi import APIRouter
-from backend.scan.nmap import NmapScanner
-
-router = APIRouter()
-
+from backend.scan.nmap import NmapScanner  
+  
+router = APIRouter()    
+ 
 @router.get("/scan_detailed/{ip_address}", tags=["nmap"])
 async def scan_detailed(ip_address: str):
     """

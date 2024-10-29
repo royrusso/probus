@@ -2,8 +2,8 @@
 import os
 import subprocess
 from loguru import logger
-import xmltodict
-import json
+import xmltodict 
+import json  
 from .nmap_utils import is_root
 
 class NmapScanner(object):

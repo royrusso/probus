@@ -1,9 +1,8 @@
-from typing import Union
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from .api import scan, default
-
+      
 app=FastAPI()
 
 tags_metadata = [
