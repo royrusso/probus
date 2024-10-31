@@ -87,7 +87,7 @@ class NmapScanner(object):
         "-p", "121314141" (will trigger an error)
         """
         nmap_path = self.which_nmap()
-        if nmap_path:
+        if nmap_path:   
             match self.scan_type:
                 case "ping":
                     flags = ["-sn", "--traceroute", "-T4", "-oX", "-", "-v"] # No port scan. Yes traceroute
