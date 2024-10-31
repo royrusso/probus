@@ -1,6 +1,6 @@
 
 from fastapi import APIRouter
-from backend.scan.nmap import NmapScanner  
+from scan.nmap import NmapScanner  
   
 router = APIRouter()    
  
@@ -40,7 +40,8 @@ async def scan_basic(ip_address: str):
 @router.get("/scan_list/{ip_address}", tags=["nmap"])
 async def scan_list(ip_address: str):
     """
-    Returns a list of IP addresses to scan.
+    Returns a list of IP addresses to scan. This call does NOT perform scan, ping, traceroute, etc. and simply returns 
+    a list of IP addresses with hostnames, if found.
     """
     nmap_scanner = NmapScanner()
     return nmap_scanner.list_scan("192.168.1.0/24")

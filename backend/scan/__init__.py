@@ -1,4 +1,1 @@
-
-# from .nmap import *  
-# from .nmap_response_parser import *
-# from .nmap_utils import *
+import os, sys; sys.path.append(os.path.dirname(os.path.realpath(__file__)))

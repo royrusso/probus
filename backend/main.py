@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from .api import scan, default
+from api import scan, default
       
 app=FastAPI()
 
@@ -48,9 +48,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-if __name__ == "__main__":
-    """
-    If using VSCode, you can run this script in the included FastAPI debug configuration.
-    """
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# if __name__ == "__main__":
+#     """
+#     If using VSCode, you can run this script in the included FastAPI debug configuration.
+#     """
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=8000)
