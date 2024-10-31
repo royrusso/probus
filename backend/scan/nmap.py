@@ -78,10 +78,10 @@ class NmapScanner(object):
         -O (Enable OS detection)
         --script (Run a script scan using the default set of scripts)
 
-        OUTPUT:
+        OUTPUT: 
         -oX (Output scan in XML format)
         -oN (Output scan in normal format)
-        
+          
         TESTING:
         -v (Increase verbosity level)
         "-p", "121314141" (will trigger an error)
@@ -110,7 +110,7 @@ class NmapScanner(object):
         Given an IP address range, returns the IP addresses in the range. This does NOT check the status, scan, nor ping each IP.
 
         From the Nmap documentation:
-    
+     
         https://nmap.org/book/man-host-discovery.html
     
         > The list scan is a degenerate form of host discovery that simply lists each host of the network(s) specified, without sending any packets to the target hosts. By default, Nmap still does reverse-DNS resolution on the hosts to learn their names. It is often surprising how much useful information simple hostnames give out. For example, fw.chi is the name of one company's Chicago firewall. Nmap also reports the total number of IP addresses at the end. The list scan is a good sanity check to ensure that you have proper IP addresses for your targets. If the hosts sport domain names you do not recognize, it is worth investigating further to prevent scanning the wrong company's network.
@@ -126,14 +126,14 @@ class NmapScanner(object):
         if ("-" in target) or ("/" in target):
             logger.error("Target {} must be a single IP address. Use list_scan instead.".format(target))
             return "Target {} must be a single IP address.".format(target)
-
+            
         self.target = target
         self.scan_type = type
         if not self.target or not self.scan_type:
             logger.error("Target and scan type must be provided.")
             return "Target and scan type must be provided."
         return self.__scan()
-
+        
     @is_root
     def __scan(self) -> str:
         """
@@ -142,8 +142,8 @@ class NmapScanner(object):
         """
         if not self.target:
             return "No target to scan."
-        
-        command = self.get_scan_command()
+               
+        command = self.get_scan_command() 
         logger.info("Running command: {}".format(" ".join(command)))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:

@@ -8,7 +8,7 @@ router = APIRouter()
 async def scan_detailed(ip_address: str):
     """
     Detailed scan of the target IP address, including port scan. 
-
+  
     In NMap terms, it runs a TCP SYN scan (nmap -sS) with a minimum rate of 2000 packets per second.
     """
     nmap_scanner = NmapScanner()
