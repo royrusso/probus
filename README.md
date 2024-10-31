@@ -1,12 +1,22 @@
 # Net Pretzel
 
-A simple, fast app that maps your network graph and identifies security vulnerabilities.
+A _FAST_ network scanner that identifies security vulnerabilities in your network and alerts you to new ones as they arise.
+
+Features:
+
+- Scan your network for open ports and services.
+- Identify security vulnerabilities in your network.
+- Dsiplay all CVEs and CVVSS scores for each device where vulnerabilities are found.
+- Alert you to new vulnerabilities as they arise.
+- Alert you to new devices on your network.
+- Platform agnostic (Windows, MacOS, Linux).
 
 ## Development
 
 ### Requirements
 
 - Python 3.13.+ (with pip)
+- Nmap installed on your system
 
 ### Installation
 
@@ -34,6 +44,18 @@ uvicorn main:app --reload
 _If using VSCode, you can run the API backend by running the debugger under `Python Debugger: FastAPI`._
 
 Once the API is running, you have access to it at [http://localhost:8000](http://localhost:8000), and the Swagger UI at [http://localhost:8000/docs](http://localhost:8000/docs).
+
+### Running the Frontend
+
+To run the frontend, run the following commands:
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Once the frontend is running, you have access to it at [http://localhost:8080](http://localhost:8080).
 
 ### Project Structure
 
