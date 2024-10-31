@@ -1,7 +1,6 @@
 name: Run tests and upload coverage
 
-on: 
-  push
+on: push
 
 jobs:
   test:
@@ -17,7 +16,7 @@ jobs:
         uses: actions/setup-python@v4
 
       - name: Install dependencies
-        run: pip install pytest pytest-cov
+        run: pip install -r requirements.txt
 
       - name: Run tests
         run: pytest --cov --cov-report=xml
