@@ -1,10 +1,19 @@
-
+from enum import Enum
 import os
 import subprocess
 from loguru import logger
-import xmltodict 
-import json  
+import xmltodict
+import json
 from .nmap_utils import is_root
+
+
+class ScanTypesEnum(str, Enum):
+    PING = "ping"
+    DETAILED = "detailed"
+    OS = "os"
+    LIST = "list"
+    VULN = "vuln"
+
 
 class NmapScanner(object):
     """
@@ -12,16 +21,16 @@ class NmapScanner(object):
 
     Speed is important, so this class will be used to scan multiple IP addresses in parallel. We will use the multiprocessing module to achieve this.
 
-    In addition, we will scan in passes, going deeper with every pass. 
-    
-    1. The first pass will be a simple ping scan to determine which hosts are up. 
-    2. The second pass will be a more detailed scan to determine the open ports and services. 
+    In addition, we will scan in passes, going deeper with every pass.
+
+    1. The first pass will be a simple ping scan to determine which hosts are up.
+    2. The second pass will be a more detailed scan to determine the open ports and services.
     3. The third pass will be a vulnerability scan to determine which hosts are vulnerable.
     """
 
     def __init__(self):
-        self.target = [] # Target IP address(es) to scan
-        self.scan_type = "ping" # The type of scan to perform
+        self.target = []  # Target IP address(es) to scan
+        self.scan_type = "ping"  # The type of scan to perform
 
     def which_nmap(self) -> str:
         """Find nmap in the system. We will likely be distributing this as a docker container, so we do have some control over the OS and nmap installation."""
@@ -47,17 +56,17 @@ class NmapScanner(object):
                 """
                 for line in stdout.decode("utf-8").split("\n"):
                     if "Nmap version" in line:
-                        version = line.split(" ")[2]    
+                        version = line.split(" ")[2]
                         logger.info("Nmap version: {}".format(version))
                         return version
-                #return stdout.decode("utf-8")
+                # return stdout.decode("utf-8")
             except subprocess.TimeoutExpired:
                 process.kill()
-                stdout, stderr = process.communicate()                
+                stdout, stderr = process.communicate()
                 return stdout.decode("utf-8")
         return None
 
-    def get_scan_command(self) :
+    def get_scan_command(self):
         """
         Get the nmap command to run based on the scan type.
 
@@ -78,29 +87,45 @@ class NmapScanner(object):
         -O (Enable OS detection)
         --script (Run a script scan using the default set of scripts)
 
-        OUTPUT: 
+        OUTPUT:
         -oX (Output scan in XML format)
         -oN (Output scan in normal format)
-          
+
         TESTING:
         -v (Increase verbosity level)
         "-p", "121314141" (will trigger an error)
         """
         nmap_path = self.which_nmap()
-        if nmap_path:   
+        if nmap_path:
             match self.scan_type:
-                case "ping":
-                    flags = ["-sn", "--traceroute", "-T4", "-oX", "-", "-v"] # No port scan. Yes traceroute
-                case "detailed":
-                    flags = ["-sS", "--min-rate", "2000", "-oX", "-"] # TCP SYN scan
-                case "os":
-                    flags = ["-Pn", "-O", "-oX", "-"] # Enable OS detection only
-                case "list":
-                    flags = ["-sL", "-oX", "-"] # sudo nmap -sL 192.168.1.200-210
-                case "vuln":
-                    flags = ["--script", "vulners", "-sV", "-O","--min-rate", "2000", "-oX", "-"] # Probe open ports to determine service/version info and vuln scan
+                case ScanTypesEnum.PING:  # No port scan. Yes traceroute
+                    flags = [
+                        "-sn",
+                        "--traceroute",
+                        "-T4",
+                        "-oX",
+                        "-",
+                        "-v",
+                    ]
+                case ScanTypesEnum.DETAILED:  # TCP SYN scan
+                    flags = ["-sS", "--min-rate", "2000", "-oX", "-"]
+                case ScanTypesEnum.OS:  # Enable OS detection only
+                    flags = ["-Pn", "-O", "-oX", "-"]
+                case ScanTypesEnum.LIST:  # List scan sudo nmap -sL 192.168.1.200-210
+                    flags = ["-sL", "-oX", "-"]
+                case ScanTypesEnum.VULN:  # Probe open ports to determine service/version info and vuln scan
+                    flags = [
+                        "--script",
+                        "vulners",
+                        "-sV",
+                        "-O",
+                        "--min-rate",
+                        "2000",
+                        "-oX",
+                        "-",
+                    ]  # Probe open ports to determine service/version info and vuln scan
                 case _:
-                    flags = ["-sn", "-Pn", "--traceroute", "-T4", "-oX", "-"] # just use ping as the default.
+                    flags = []  # just use ping as the default.
             command = [nmap_path] + flags + [self.target]
             return command
         return None
@@ -110,9 +135,9 @@ class NmapScanner(object):
         Given an IP address range, returns the IP addresses in the range. This does NOT check the status, scan, nor ping each IP.
 
         From the Nmap documentation:
-     
+
         https://nmap.org/book/man-host-discovery.html
-    
+
         > The list scan is a degenerate form of host discovery that simply lists each host of the network(s) specified, without sending any packets to the target hosts. By default, Nmap still does reverse-DNS resolution on the hosts to learn their names. It is often surprising how much useful information simple hostnames give out. For example, fw.chi is the name of one company's Chicago firewall. Nmap also reports the total number of IP addresses at the end. The list scan is a good sanity check to ensure that you have proper IP addresses for your targets. If the hosts sport domain names you do not recognize, it is worth investigating further to prevent scanning the wrong company's network.
         Since the idea is to simply print a list of target hosts, options for higher level functionality such as port scanning, OS detection, or host discovery cannot be combined with this. If you wish to disable host discovery while still performing such higher level functionality, read up on the -Pn (skip host discovery) option.
 
@@ -122,18 +147,23 @@ class NmapScanner(object):
         return self.__scan()
 
     @is_root
-    def scan(self, target: str, type: str  ) -> str:
-        if ("-" in target) or ("/" in target):
-            logger.error("Target {} must be a single IP address. Use list_scan instead.".format(target))
-            return "Target {} must be a single IP address.".format(target)
-            
+    def scan(self, target: str, type: str) -> str:
+        # Rethinking this...
+        # if ("-" in target) or ("/" in target):
+        #     logger.error(
+        #         "Target {} must be a single IP address. Use list_scan instead.".format(
+        #             target
+        #         )
+        #     )
+        #     return "Target {} must be a single IP address.".format(target)
+
         self.target = target
         self.scan_type = type
         if not self.target or not self.scan_type:
             logger.error("Target and scan type must be provided.")
             return "Target and scan type must be provided."
         return self.__scan()
-        
+
     @is_root
     def __scan(self) -> str:
         """
@@ -142,15 +172,15 @@ class NmapScanner(object):
         """
         if not self.target:
             return "No target to scan."
-               
-        command = self.get_scan_command() 
+
+        command = self.get_scan_command()
         logger.info("Running command: {}".format(" ".join(command)))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
-            stdout, stderr = process.communicate(timeout=30) # TODO: timeout should be configurable
-            #logger.info("Scan Results: {}".format(stdout.decode("utf-8")))
+            stdout, stderr = process.communicate(timeout=30)  # TODO: timeout should be configurable
+            # logger.info("Scan Results: {}".format(stdout.decode("utf-8")))
             json_stdout_response = json.dumps(xmltodict.parse(stdout.decode("utf-8")), indent=4)
-            
+
             logger.info("Scan Results: {}".format(json_stdout_response))
             if stderr:
                 logger.error("Scan Errors: {}".format(stderr.decode("utf-8")))
@@ -163,15 +193,16 @@ class NmapScanner(object):
             logger.error("Error: {}".format(e))
             return None
 
+
 if __name__ == "__main__":
     nmap_scanner = NmapScanner()
     nmap_scanner.nmap_version()
 
-    #nmap.target = "192.168.50.140-144"
-    #nmap.target = "192.168.20.51-58"
-    #nmap.target = "192.168.20.51"
-    #nmap_scanner.target = "192.168.1.196"
-    #nmap.target = "192.168.1.180"
+    # nmap.target = "192.168.50.140-144"
+    # nmap.target = "192.168.20.51-58"
+    # nmap.target = "192.168.20.51"
+    # nmap_scanner.target = "192.168.1.196"
+    # nmap.target = "192.168.1.180"
     nmap_scanner.scan_type = "ping"
     nmap_scanner.scan("192.168.1.196", "ping")
 

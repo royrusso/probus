@@ -1,6 +1,3 @@
-
-
- 
 class NmapParser(object):
     def __init__(self, nmap_output: str):
         self.nmap_output = nmap_output

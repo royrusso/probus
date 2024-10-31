@@ -4,7 +4,6 @@ loguru~=0.7.2
 xmltodict~=0.14.2
 fastapi~=0.115.4
 uvicorn~=0.32.0
-black~=24.10.0
 
 # Testing
 pytest

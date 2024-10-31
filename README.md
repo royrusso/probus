@@ -21,6 +21,7 @@ Features:
 
 ![Last Commit](https://img.shields.io/github/last-commit/royrusso/net-pretzel)
 ![Commits per month](https://img.shields.io/github/commit-activity/m/royrusso/net-pretzel)
+<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 
 ### Requirements
 
