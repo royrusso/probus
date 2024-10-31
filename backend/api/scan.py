@@ -2,7 +2,7 @@
 from fastapi import APIRouter
 from scan.nmap import NmapScanner  
   
-router = APIRouter()    
+router = APIRouter()      
  
 @router.get("/scan_detailed/{ip_address}", tags=["nmap"])
 async def scan_detailed(ip_address: str):
