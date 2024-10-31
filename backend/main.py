@@ -5,6 +5,7 @@ from api import scan, default
       
 app=FastAPI()
 
+
 tags_metadata = [
     { 
         "name": "nmap",
