@@ -3,6 +3,8 @@
 [![codecov](https://codecov.io/github/royrusso/net-pretzel/graph/badge.svg?token=B972KDOOOB)](https://codecov.io/github/royrusso/net-pretzel)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/royrusso/net-pretzel/pytests_codecov.yml)
 
+### This project is in early development!
+
 A _FAST_ network scanner that identifies security vulnerabilities in your network and alerts you to new ones as they arise.
 
 Features:
