@@ -5,27 +5,13 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [react()],
   server: {
+    open: "public/index.html",
     //open: "/index.html",
     port: 8080,
   },
-  resolve: {
-    alias: {
-      "~bootstrap": "bootstrap",
-    },
-  },
+  // resolve: {
+  //   alias: {
+  //     "~bootstrap": "bootstrap",
+  //   },
+  // },
 });
-
-// const path = require("path");
-
-// export default {
-//   root: path.resolve(__dirname, "src"),
-//   resolve: {
-//     alias: {
-//       "~bootstrap": path.resolve(__dirname, "node_modules/bootstrap"),
-//     },
-//   },
-//   server: {
-//     port: 8080,
-//     hot: true,
-//   },
-// };

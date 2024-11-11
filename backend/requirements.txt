@@ -1,9 +1,9 @@
-
 python-dotenv==1.0.1
 loguru~=0.7.2
 xmltodict~=0.14.2
 fastapi~=0.115.4
 uvicorn~=0.32.0
+FindMyIP~=1.2.0
 
 # Testing
 pytest

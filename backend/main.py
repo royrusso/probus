@@ -53,9 +53,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# if __name__ == "__main__":
-#     """
-#     If using VSCode, you can run this script in the included FastAPI debug configuration.
-#     """
-#     import uvicorn
-#     uvicorn.run(app, host="0.0.0.0", port=8000)
+if __name__ == "__main__":
+    """
+    If using VSCode, you can run this script in the included FastAPI debug configuration.
+    """
+    import FindMyIP as ip
+
+    print(ip.internet())
+    print(ip.internal())
+    print(ip.external())
+
+    # import uvicorn
+    # uvicorn.run(app, host="0.0.0.0", port=8000)

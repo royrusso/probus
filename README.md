@@ -60,7 +60,7 @@ Once the API is running, you have access to it at [http://localhost:8000](http:/
 This project uses `pytest` for testing. To run the tests, run the following command:
 
 ```bash
-pytest --cov --cov-report=xml
+pytest --cov
 ```
 
 ### Running the Frontend
@@ -75,19 +75,7 @@ npm start
 
 Once the frontend is running, you can access to it at [http://localhost:8080](http://localhost:8080).
 
-### Project Structure
+#### Developer Notes:
 
-```bash
-|-- backend/
-│   ├── api/              # API Endpoints
-│   │── scan/              # NMap scanner
-│   │── main.py            # FastAPI entrypoint
-├── frontend/               # React Frontend
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── App.tsx
-│   └── package.json        # Frontend dependencies
-├── .gitignore
-└── README.md
-```
+- This project makes use of [FastAPI](https://fastapi.tiangolo.com/) for the backend.
+- This project uses [react-bootstrap](https://react-bootstrap.github.io/) for the fronten components.
