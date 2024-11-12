@@ -4,7 +4,7 @@ from scan.nmap import NmapScanner
 router = APIRouter()
 
 
-@router.get("/scan_detailed/{ip_address}", tags=["nmap"])
+@router.get("/scan_detailed/{ip_address}", tags=["scan"])
 async def scan_detailed(ip_address: str):
     """
     Detailed scan of the target IP address, including port scan.
@@ -12,16 +12,11 @@ async def scan_detailed(ip_address: str):
     In NMap terms, it runs a TCP SYN scan (nmap -sS) with a minimum rate of 2000 packets per second.
     """
     nmap_scanner = NmapScanner()
-    # nmap.target = "192.168.50.140-144"
-    # nmap.target = "192.168.20.51-58"
-    # nmap.target = "192.168.20.51"
-    # nmap_scanner.target = "192.168.1.196"
-    # nmap.target = "192.168.1.180"
-    result = nmap_scanner.scan("192.168.1.196", "detailed")
+    result = nmap_scanner.scan(ip_address, "detailed")
     return {"result": result}
 
 
-@router.get("/scan_ping/{ip_address}", tags=["nmap"])
+@router.get("/scan_ping/{ip_address}", tags=["scan"])
 async def scan_basic(ip_address: str):
     """
     First pass at a scan. Just pings the target and conducts a traceroute. No port scan.
@@ -29,17 +24,35 @@ async def scan_basic(ip_address: str):
     In NMap terms, it runs a basic no-port-scan (nmap -sn --traceroute).
     """
     nmap_scanner = NmapScanner()
-
-    # nmap.target = "192.168.50.140-144"
-    # nmap.target = "192.168.20.51-58"
-    # nmap.target = "192.168.20.51"
-    # nmap_scanner.target = "192.168.1.196"
-    # nmap.target = "192.168.1.180"
-    result = nmap_scanner.scan("192.168.1.196", "ping")
+    result = nmap_scanner.scan(ip_address, "ping")
     return {"result": result}
 
 
-@router.get("/scan_list/{ip_address}", tags=["nmap"])
+@router.get("/scan_os/{ip_address}", tags=["scan"])
+async def scan_os(ip_address: str):
+    """
+    Scan the target IP address for OS detection.
+
+    In NMap terms, it runs an OS detection scan (nmap -Pn -O).
+    """
+    nmap_scanner = NmapScanner()
+    result = nmap_scanner.scan(ip_address, "os")
+    return {"result": result}
+
+
+@router.get("/scan_vuln/{ip_address}", tags=["scan"])
+async def scan_vuln(ip_address: str):
+    """
+    Scan the target IP address for OS detection and vulnerabilities.
+
+    In NMap terms, it runs a service/version detection scan and a vulnerability scan (nmap --script vulners -sV -O).
+    """
+    nmap_scanner = NmapScanner()
+    result = nmap_scanner.scan(ip_address, "vuln")
+    return {"result": result}
+
+
+@router.get("/scan_list/{ip_address}", tags=["scan"])
 async def scan_list(ip_address: str):
     """
     Returns a list of IP addresses to scan. This call does NOT perform scan, ping, traceroute, etc. and simply returns

@@ -23,13 +23,13 @@ class NmapScanner(object):
 
     In addition, we will scan in passes, going deeper with every pass.
 
-    1. The first pass will be a simple ping scan to determine which hosts are up.
-    2. The second pass will be a more detailed scan to determine the open ports and services.
-    3. The third pass will be a vulnerability scan to determine which hosts are vulnerable.
+    1. The first pass will be a simple ping scan to determine which hosts are up. "ping"
+    2. The second pass will be a more detailed scan to determine the open ports and services. "detailed"
+    3. The third pass will be a vulnerability scan to determine which hosts are vulnerable. "vuln"
     """
 
     def __init__(self):
-        self.target = []  # Target IP address(es) to scan
+        self.target = []  # Target IP address(es) to scan because we want to run these in batches.
         self.scan_type = "ping"  # The type of scan to perform
 
     def which_nmap(self) -> str:
@@ -50,6 +50,7 @@ class NmapScanner(object):
             try:
                 stdout, stderr = process.communicate(timeout=10)
                 """
+                Output looks like this:
                 Nmap version 7.95 ( https://nmap.org )
                 Platform: arm-apple-darwin23.4.0
                 Compiled with: liblua-5.4.6 openssl-3.3.2 libssh2-1.11.0 libz-1.2.12 libpcre2-10.44 nmap-libpcap-1.10.4 nmap-libdnet-1.12 ipv6
@@ -98,7 +99,9 @@ class NmapScanner(object):
         nmap_path = self.which_nmap()
         if nmap_path:
             match self.scan_type:
-                case ScanTypesEnum.PING:  # No port scan. Yes traceroute
+                case (
+                    ScanTypesEnum.PING
+                ):  # No port scan. Yes traceroute sudo nmap -sn --traceroute -T4 -oX - -v 192.168.1.196
                     flags = [
                         "-sn",
                         "--traceroute",
@@ -110,7 +113,7 @@ class NmapScanner(object):
                 case ScanTypesEnum.DETAILED:  # TCP SYN scan
                     flags = ["-sS", "--min-rate", "2000", "-oX", "-"]
                 case ScanTypesEnum.OS:  # Enable OS detection only
-                    flags = ["-Pn", "-O", "-oX", "-"]
+                    flags = ["-sS", "-O", "--min-rate", "2000", "-oX", "-"]
                 case ScanTypesEnum.LIST:  # List scan sudo nmap -sL 192.168.1.200-210
                     flags = ["-sL", "-oX", "-"]
                 case ScanTypesEnum.VULN:  # Probe open ports to determine service/version info and vuln scan
