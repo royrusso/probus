@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from api import scan, default
+from api import scan, default, info
 from loguru import logger
 
 app = FastAPI()
@@ -35,7 +35,9 @@ def netpretzel_openapi_schema():
 origins = ["*"]
 app = FastAPI()
 app.include_router(scan.router)
+app.include_router(info.router)
 app.include_router(default.router)
+
 
 app.openapi = netpretzel_openapi_schema
 

@@ -17,7 +17,11 @@ Features:
 - Alert you to new devices on your network.
 - Platform agnostic (Windows, MacOS, Linux).
 
-## Development
+## Installation
+
+Download the Docker from: TODO
+
+## Local Development
 
 ![Last Commit](https://img.shields.io/github/last-commit/royrusso/net-pretzel)
 ![Commits per month](https://img.shields.io/github/commit-activity/m/royrusso/net-pretzel)
