@@ -127,6 +127,9 @@ class NmapScanner(object):
                         "-oX",
                         "-",
                     ]  # Probe open ports to determine service/version info and vuln scan
+                    # TODO: consider adding --script-args mincvss=6.5
+                # When using any of the bulk scans, the results can become overwhelming and some users will want to exclude low CVSS score vulnerabilities.
+                # To only show vulnerabilities within a certain range, add the following flag to the command where “x.x” is the CVSS score (ex: 6.5).
                 case _:
                     flags = []  # just use ping as the default.
             command = [nmap_path] + flags + [self.target]
