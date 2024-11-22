@@ -4,9 +4,9 @@
 ![Tests](https://img.shields.io/github/actions/workflow/status/royrusso/minerva/pytests_codecov.yml?label=Tests)
 ![License](https://img.shields.io/github/license/royrusso/minerva)
 
-### This project is in early development!
+# This project is in early development!
 
-![Minerva Logo](frontend/src/assets/minerva_logo.png)
+![Minerva Logo](frontend/src/assets/minerva_logo_350.png)
 
 A _FAST_ network scanner that identifies security vulnerabilities in your network and alerts you to new ones as they arise.
 
