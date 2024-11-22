@@ -1,0 +1,28 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit"
+  },
+  "files.watcherExclude": {
+    "**/target": true
+  },
+  "explorer.autoRevealExclude": {
+    "**/node_modules": true,
+    "bazel-*": true
+  },
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "MODULE.bazel": "WORKSPACE*, MODULE.bazel.lock, .bazel*",
+    "package.json": "package-lock.json, pnpm-lock.yaml, pnpm-workspace.yaml, .npmrc, .eslintrc.cjs"
+  },
+  // "python.analysis.exclude": ["bazel*", "external", ".bazel*"],
+  "python.languageServer": "Pylance",
+  "python.analysis.fixAll": ["source.unusedImports"],
+  //    "python.defaultInterpreterPath": "${workspaceFolder}/backend/python/.venv/bin/python",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true
+  },
+  "black-formatter.args": ["--line-length", "120"]
+}

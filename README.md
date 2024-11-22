@@ -1,10 +1,12 @@
-# Net Pretzel
+# Minerva
 
-[![codecov](https://codecov.io/github/royrusso/net-pretzel/graph/badge.svg?token=B972KDOOOB)](https://codecov.io/github/royrusso/net-pretzel)
-![Tests](https://img.shields.io/github/actions/workflow/status/royrusso/net-pretzel/pytests_codecov.yml?label=Tests)
-![License](https://img.shields.io/github/license/royrusso/net-pretzel)
+[![codecov](https://codecov.io/github/royrusso/minerva/graph/badge.svg?token=B972KDOOOB)](https://codecov.io/github/royrusso/minerva)
+![Tests](https://img.shields.io/github/actions/workflow/status/royrusso/minerva/pytests_codecov.yml?label=Tests)
+![License](https://img.shields.io/github/license/royrusso/minerva)
 
 ### This project is in early development!
+
+![Minerva Logo](frontend/src/assets/minerva_logo.png)
 
 A _FAST_ network scanner that identifies security vulnerabilities in your network and alerts you to new ones as they arise.
 
@@ -23,8 +25,8 @@ Download the Docker from: TODO
 
 ## Local Development
 
-![Last Commit](https://img.shields.io/github/last-commit/royrusso/net-pretzel)
-![Commits per month](https://img.shields.io/github/commit-activity/m/royrusso/net-pretzel)
+![Last Commit](https://img.shields.io/github/last-commit/royrusso/minerva)
+![Commits per month](https://img.shields.io/github/commit-activity/m/royrusso/minerva)
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 
 ### Requirements
@@ -50,14 +52,21 @@ With root access, now you can run the backend:
 
 ```bash
 cd backend
-uvicorn main:app --reload
+fastapi dev main.py
 ```
 
 Alternatively, you can run the backend with the following command:
 
 ```bash
 cd backend
-python main.py
+uvicorn main:app --reload
+```
+
+For production, you can run the backend with the following command:
+
+```bash
+cd backend
+fastapi run
 ```
 
 Once the API is running, you have access to it at [http://localhost:8000](http://localhost:8000), and the Swagger UI at [http://localhost:8000/docs](http://localhost:8000/docs).

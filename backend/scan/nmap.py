@@ -183,7 +183,7 @@ class NmapScanner(object):
         logger.info("Running command: {}".format(" ".join(command)))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
-            stdout, stderr = process.communicate(timeout=30)  # TODO: timeout should be configurable
+            stdout, stderr = process.communicate(timeout=300)  # TODO: timeout should be configurable
             # logger.info("Scan Results: {}".format(stdout.decode("utf-8")))
             json_stdout_response = json.dumps(xmltodict.parse(stdout.decode("utf-8")), indent=4)
 
@@ -204,11 +204,6 @@ if __name__ == "__main__":
     nmap_scanner = NmapScanner()
     nmap_scanner.nmap_version()
 
-    # nmap.target = "192.168.50.140-144"
-    # nmap.target = "192.168.20.51-58"
-    # nmap.target = "192.168.20.51"
-    # nmap_scanner.target = "192.168.1.196"
-    # nmap.target = "192.168.1.180"
     nmap_scanner.scan_type = "ping"
     nmap_scanner.scan("192.168.1.196", "ping")
 
@@ -217,6 +212,3 @@ if __name__ == "__main__":
     nmap_scanner.scan("192.168.1.0/24", "ping")
 
     nmap_scanner.list_scan("192.168.1.0/24")
-
-    # nmap.scan_type = "vuln"
-    # nmap.scan()

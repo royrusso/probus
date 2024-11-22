@@ -7,25 +7,25 @@ from loguru import logger
 app = FastAPI()
 
 
-def netpretzel_openapi_schema():
+def minerva_openapi_schema():
     openapi_schema = get_openapi(
-        title="Pretzel",
+        title="Minerva",
         version="1.0",
-        description="Pretzel API",
+        description="Minerva API",
         routes=app.routes,
     )
     openapi_schema["info"] = {
-        "title": "Net Pretzel REST API",
+        "title": "Minerave REST API",
         "version": "1.0",
-        "description": "REST API for Net Pretzel - a network security tool",
+        "description": "REST API for Minerva - a network security tool",
         "contact": {
             "name": "Get Help with this API",
-            "url": "https://github.com/royrusso/net-pretzel",
+            "url": "https://github.com/royrusso/minerva",
             "email": "",
         },
         "license": {
             "name": "AGPL v3",
-            "url": "https://github.com/royrusso/net-pretzel/blob/master/LICENSE",
+            "url": "https://github.com/royrusso/minerva/blob/master/LICENSE",
         },
     }
     app.openapi_schema = openapi_schema
@@ -39,7 +39,7 @@ app.include_router(info.router)
 app.include_router(default.router)
 
 
-app.openapi = netpretzel_openapi_schema
+app.openapi = minerva_openapi_schema
 
 # TODO: We should disable this and reverse proxy through the UI's dev server.
 #       That will match more closely with how we deploy and eliminate the need for CORS.
