@@ -1,12 +1,10 @@
-# Minerva
+![Minerva Logo](frontend/src/assets/minerva_logo_300.png)
 
 [![codecov](https://codecov.io/github/royrusso/minerva/graph/badge.svg?token=B972KDOOOB)](https://codecov.io/github/royrusso/minerva)
 ![Tests](https://img.shields.io/github/actions/workflow/status/royrusso/minerva/pytests_codecov.yml?label=Tests)
 ![License](https://img.shields.io/github/license/royrusso/minerva)
 
 # This project is in early development!
-
-![Minerva Logo](frontend/src/assets/minerva_logo_300.png)
 
 A _FAST_ network scanner that identifies security vulnerabilities in your network and alerts you to new ones as they arise.
 
