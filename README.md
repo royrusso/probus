@@ -6,7 +6,7 @@
 
 # This project is in early development!
 
-![Minerva Logo](frontend/src/assets/minerva_logo_350.png)
+![Minerva Logo](frontend/src/assets/minerva_logo_300.png)
 
 A _FAST_ network scanner that identifies security vulnerabilities in your network and alerts you to new ones as they arise.
 
