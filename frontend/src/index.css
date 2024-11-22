@@ -1,0 +1,14 @@
+.formfield-help {
+  font-size: 0.8em !important;
+  color: #888 !important;
+}
+
+/*
+  * Custom class for the react-icons that are wrapped by a provider
+  */
+.react-icon-button {
+  /* display: inline-block; */
+  /* margin: 0 0.5em; */
+  font-size: 1.5em !important;
+  margin: 0 0.1em;
+}

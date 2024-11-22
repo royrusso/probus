@@ -1,4 +1,5 @@
-import { Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
+import Home from "./components/home";
 import Header from "./layouts/header";
 //
 const App = () => {
@@ -6,7 +7,9 @@ const App = () => {
     <>
       <Header />
       <main>
-        <Routes></Routes>
+        <Routes>
+          <Route index element={<Home />} />
+        </Routes>
       </main>
     </>
   );
