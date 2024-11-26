@@ -8,88 +8,46 @@
 
 A _FAST_ network scanner that identifies security vulnerabilities in your network and alerts you to new ones as they arise.
 
-Features:
+## Table of Contents
 
-- Scan your network for open ports and services.
-- Identify security vulnerabilities in your network.
-- Display all CVEs and CVVSS scores for each device where vulnerabilities are found.
-- Alert you to new vulnerabilities as they arise.
-- Alert you to new devices on your network.
-- Platform agnostic (Windows, MacOS, Linux).
+- [Introduction](#introduction)
+  - [Features](#features)
+- [Installation](#installation)
+- [Development](#development)
+- [Contributing](#contributing)
+- [Contact](#contact)
+- [License](#license)
+
+## Introduction
+
+Minerva is a network scanner that identifies security vulnerabilities in your network and alerts you to new ones as they arise. Minerva scans your network quickly using a combination of Nmap and a 3-pass scanning technique to identify hosts and open ports. It then uses the CVE database to identify vulnerabilities on a per-device basis.
+
+Minerva is platform-agnostic - built with a FastAPI backend and a React frontend - available as a Docker container.
+
+### Features:
+
+- **Network Scanner:** Scans your network for hosts and open ports.
+- **Vulnerability Scanner:** Identifies security vulnerabilities in your network on a per-device basis.
+- **Scan and Vulnerability History:** Keeps a history of scans and vulnerabilities identified.
+- **Alerting:** Alerts you to new vulnerabilities as they arise, new devices added to your network, given a network range.
+- **Platform agnostic**: (Windows, MacOS, Linux).
 
 ## Installation
 
 Download the Docker from: TODO
 
-## Local Development
+## Development
 
-![Last Commit](https://img.shields.io/github/last-commit/royrusso/minerva)
-![Commits per month](https://img.shields.io/github/commit-activity/m/royrusso/minerva)
-<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+Please read the [DEVELOPMENT.md](DEVELOPMENT.md) file for more information on how to run this project locally.
 
-### Requirements
+## Contributing
 
-- Python 3.13.+ (with pip)
-- Nmap installed on your system
+Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information on how to contribute to this project.
 
-### Running the Backend
+## Contact
 
-To install the backend dependencies, run the following command:
+- Use **GitHub Issues** for code-related issues.
 
-```bash
-pip install -r backend/requirements.txt
-```
+## License
 
-**Scanning your network requires root access!** To get root access, run the following command:
-
-```bash
-sudo su
-```
-
-With root access, now you can run the backend:
-
-```bash
-cd backend
-fastapi dev main.py
-```
-
-Alternatively, you can run the backend with the following command:
-
-```bash
-cd backend
-uvicorn main:app --reload
-```
-
-For production, you can run the backend with the following command:
-
-```bash
-cd backend
-fastapi run
-```
-
-Once the API is running, you have access to it at [http://localhost:8000](http://localhost:8000), and the Swagger UI at [http://localhost:8000/docs](http://localhost:8000/docs).
-
-#### Testing the Backend
-
-This project uses `pytest` for testing. To run the tests, run the following command:
-
-```bash
-pytest --cov
-```
-
-### Running the Frontend
-
-To run the frontend, run the following commands:
-
-```bash
-cd frontend
-npm install
-npm start
-```
-
-Once the frontend is running, you can access to it at [http://localhost:8080](http://localhost:8080).
-
-#### Developer Notes:
-
-- This project makes use of [FastAPI](https://fastapi.tiangolo.com/) for the backend.
-- This project uses [react-bootstrap](https://react-bootstrap.github.io/) for the frontend components.
+Minerva is licensed under the [Apache License 2.0](LICENSE).
