@@ -72,7 +72,13 @@ Once the API is running, you have access to it at [http://localhost:8000](http:/
 This project uses `pytest` for testing. To run the tests, run the following command:
 
 ```bash
-pytest --cov
+sudo pytest --cov
+```
+
+To generate a coverage report, run the following command:
+
+```bash
+sudo pytest --cov --cov-report=html
 ```
 
 ## Running the Frontend
