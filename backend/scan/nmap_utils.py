@@ -12,7 +12,8 @@ def is_root(func):
             logger.error(
                 "You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting."
             )
-            exit()
+            return {"error": True, "message": "You need to have root privileges to run this script."}
+            # exit()
         return func(*args, **kwargs)
 
     return wrapper

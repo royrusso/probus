@@ -4,7 +4,7 @@ from scan.nmap import NmapScanner
 router = APIRouter()
 
 
-@router.get("/scan_detailed/{ip_address:path}", tags=["scan"])
+@router.get("/scan/detailed/{ip_address:path}", tags=["scan"])
 async def scan_detailed(ip_address: str):
     """
     Detailed scan of the target IP address, including port scan.
@@ -16,7 +16,7 @@ async def scan_detailed(ip_address: str):
     return {"result": result}
 
 
-@router.get("/scan_ping/{ip_address:path}", tags=["scan"])
+@router.get("/scan/ping/{ip_address:path}", tags=["scan"])
 async def scan_basic(ip_address: str):
     """
     First pass at a scan. Just pings the target and conducts a traceroute. No port scan.
@@ -28,7 +28,7 @@ async def scan_basic(ip_address: str):
     return {"result": result}
 
 
-@router.get("/scan_os/{ip_address:path}", tags=["scan"])
+@router.get("/scan/os/{ip_address:path}", tags=["scan"])
 async def scan_os(ip_address: str):
     """
     Scan the target IP address for OS detection.
@@ -40,7 +40,7 @@ async def scan_os(ip_address: str):
     return {"result": result}
 
 
-@router.get("/scan_vuln/{ip_address:path}", tags=["scan"])
+@router.get("/scan/vuln/{ip_address:path}", tags=["scan"])
 async def scan_vuln(ip_address: str):
     """
     Scan the target IP address for OS detection and vulnerabilities.
@@ -52,11 +52,15 @@ async def scan_vuln(ip_address: str):
     return {"result": result}
 
 
-@router.get("/scan_list/{ip_address:path}", tags=["scan"])
+@router.get("/scan/list/{ip_address:path}", tags=["scan"])
 async def scan_list(ip_address: str):
     """
     Returns a list of IP addresses to scan. This call does NOT perform scan, ping, traceroute, etc. and simply returns
     a list of IP addresses with hostnames, if found.
     """
     nmap_scanner = NmapScanner()
-    return nmap_scanner.list_scan(ip_address)
+    try:
+        response = nmap_scanner.list_scan(ip_address)
+    except Exception as e:
+        response = str(e)
+    return {"result": response}

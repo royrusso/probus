@@ -6,7 +6,7 @@ from loguru import logger
 router = APIRouter()
 
 
-@router.get("/ipinfo", tags=["info"])
+@router.get("/info/ip", tags=["info"])
 def get_ip_info():
     """
     Returns information about the IP address of the server.
@@ -14,7 +14,7 @@ def get_ip_info():
     return {"internet_connected": ip.internet(), "internal_ip": ip.internal(), "external_ip": ip.external()}
 
 
-@router.get("/is_root", tags=["info"])
+@router.get("/info/is_root", tags=["info"])
 def is_root():
     """
     Returns whether the user is root or not.
@@ -23,3 +23,8 @@ def is_root():
         logger.error("You need to have root privileges. Some functionality may not work as expected.")
         return {"is_root": False}
     return {"is_root": True}
+
+
+@router.get("/info/health", tags=["info"])
+def read_health():
+    return {"status": "OK"}

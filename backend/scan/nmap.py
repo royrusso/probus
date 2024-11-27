@@ -104,11 +104,9 @@ class NmapScanner(object):
                 ):  # No port scan. Yes traceroute sudo nmap -sn --traceroute -T4 -oX - -v 192.168.1.196
                     flags = [
                         "-sn",
-                        "--traceroute",
                         "-T4",
                         "-oX",
                         "-",
-                        "-v",
                     ]
                 case ScanTypesEnum.DETAILED:  # TCP SYN scan
                     flags = ["-sS", "--min-rate", "2000", "-oX", "-"]

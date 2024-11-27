@@ -9,12 +9,19 @@
       "console": "integratedTerminal"
     },
     {
-      "name": "Python Debugger: FastAPI",
+      "name": "Python Debugger: Uvicorn",
       "type": "debugpy",
       "request": "launch",
       "module": "uvicorn",
       "args": ["backend.main:app", "--reload"],
       "jinja": true
+    },
+    {
+      "name": "FastAPI",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "fastapi",
+      "args": ["dev", "backend/main.py", "--reload"]
     }
   ]
 }

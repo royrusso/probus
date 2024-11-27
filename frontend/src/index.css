@@ -7,8 +7,11 @@
   * Custom class for the react-icons that are wrapped by a provider
   */
 .react-icon-button {
-  /* display: inline-block; */
-  /* margin: 0 0.5em; */
-  font-size: 1.5em !important;
-  margin: 0 0.1em;
+  display: inline-block;
+  font-size: 1em;
+
+  /* Center the icon */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

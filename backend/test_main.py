@@ -7,10 +7,10 @@ client = TestClient(app)
 def test_read_default():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"Net Pretzel says": "Hello World"}
+    assert response.json() == {"Minerva says": "Hello World"}
 
 
 def test_health_check():
-    response = client.get("/health")
+    response = client.get("/info/health")
     assert response.status_code == 200
     assert response.json() == {"status": "OK"}
