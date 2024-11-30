@@ -15,7 +15,7 @@ def minerva_openapi_schema():
         routes=app.routes,
     )
     openapi_schema["info"] = {
-        "title": "Minerave REST API",
+        "title": "Minerva REST API",
         "version": "1.0",
         "description": "REST API for Minerva - a network security tool",
         "contact": {
