@@ -24,6 +24,7 @@ async def scan_basic(ip_address: str):
     In NMap terms, it runs a basic no-port-scan (nmap -sn --traceroute).
     """
     nmap_scanner = NmapScanner()
+
     result = nmap_scanner.scan(ip_address, "ping")
     return {"result": result}
 

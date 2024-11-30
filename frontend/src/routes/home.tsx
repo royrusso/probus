@@ -8,7 +8,8 @@ import {
   Row,
   Toast,
 } from "react-bootstrap";
-import { scanPingType } from "../services/Client";
+import { fetchIPList, fetchPingData } from "../services/Client";
+import { IPListToRange } from "../utils/IPUtils";
 
 const Home = () => {
   const [scanFormData, setScanFormData] = useState({
@@ -49,13 +50,59 @@ const Home = () => {
       `Scan started for IP Address(es): ${scanFormData.ipAddress}`
     );
 
-    // Send the scan request to the backend
-    // scanListType(scanFormData.ipAddress).then((data) => {
-    //   console.log("Scan Response: ", data);
-    // });
+    // const result = doFullScan(scanFormData.ipAddress);
 
-    scanPingType(scanFormData.ipAddress).then((data) => {
-      console.log("Ping Response: ", data);
+    let ipList = fetchIPList(scanFormData.ipAddress);
+    ipList.then((data) => {
+      console.log("IP List: ", data);
+      if (data.length === 0) {
+        console.log("No IP Address found in the given range");
+        return;
+      }
+
+      // get host IP object
+      const hosts = data.result.nmaprun.host;
+
+      console.log("Hosts: ", hosts);
+
+      // divide hosts into chunks of 10 for parallel scanning
+      const chunkSize = 10;
+      const chunkedHosts = [];
+      for (let i = 0; i < hosts.length; i += chunkSize) {
+        chunkedHosts.push(hosts.slice(i, i + chunkSize));
+      }
+
+      console.log("Chunked Hosts: ", chunkedHosts);
+
+      // for each chunk, convert the IP list to IP range and scan in parallel
+      chunkedHosts.forEach((chunk: any) => {
+        const ipRange = IPListToRange(
+          chunk.map((host: any) => host.address["@addr"])
+        );
+        console.log("IP Range: ", ipRange);
+
+        fetchPingData(ipRange)
+          .then((data) => {
+            console.log("Ping Data: ", data);
+
+            // Sometimes host is missing, if all IPs are down.
+            if ("host" in data.result.nmaprun) {
+              const hosts = data.result.nmaprun.host;
+
+              // hosts can be an array, when multiple hosts are up. Otherwise, it's an object.
+              if (hosts.isArray) {
+                hosts.forEach((host: any) => {
+                  console.log("Host: ", host);
+                });
+              } else {
+                console.log("Host: ", hosts);
+              }
+            }
+          })
+          .finally(() => {
+            console.log("Ping scan completed");
+          });
+      });
     });
   };
 
