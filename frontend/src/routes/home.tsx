@@ -8,17 +8,16 @@ import {
   Row,
   Toast,
 } from "react-bootstrap";
-import { fetchIPList, fetchPingData } from "../services/Client";
-import { IPListToRange } from "../utils/IPUtils";
+import { fetchDetailedData, fetchPingData } from "../services/Client";
 
 const Home = () => {
   const [scanFormData, setScanFormData] = useState({
     ipAddress: "",
-    scanType: "full",
+    scanType: "",
   });
   const [validated, setValidated] = useState(false);
   const [showToast, setShowToast] = useState(false);
-
+  const [results, setResults] = useState<any[]>([]);
   const [scanFormToastMessage, setScanFormToastMessage] = useState("");
 
   const handleChange = (e: { target: { id: any; value: any } }) => {
@@ -50,60 +49,39 @@ const Home = () => {
       `Scan started for IP Address(es): ${scanFormData.ipAddress}`
     );
 
-    // const result = doFullScan(scanFormData.ipAddress);
+    const fetchScanData = async (ipRange: string) => {
+      console.log("Scanning IP Range: ", ipRange);
+      let scanData = await fetchPingData(ipRange);
+      setResults((prevResults) => [...prevResults, scanData]);
+      return scanData;
+    };
 
-    let ipList = fetchIPList(scanFormData.ipAddress);
-    ipList.then((data) => {
-      console.log("IP List: ", data);
-      if (data.length === 0) {
-        console.log("No IP Address found in the given range");
-        return;
-      }
+    const response = fetchScanData(scanFormData.ipAddress);
+    response
+      .then((data) => {
+        console.log("Ping Data: ", data);
 
-      // get host IP object
-      const hosts = data.result.nmaprun.host;
+        // Sometimes host is missing, if all IPs are down.
+        if ("host" in data.result.nmaprun) {
+          const hosts = data.result.nmaprun.host;
 
-      console.log("Hosts: ", hosts);
-
-      // divide hosts into chunks of 10 for parallel scanning
-      const chunkSize = 10;
-      const chunkedHosts = [];
-      for (let i = 0; i < hosts.length; i += chunkSize) {
-        chunkedHosts.push(hosts.slice(i, i + chunkSize));
-      }
-
-      console.log("Chunked Hosts: ", chunkedHosts);
-
-      // for each chunk, convert the IP list to IP range and scan in parallel
-      chunkedHosts.forEach((chunk: any) => {
-        const ipRange = IPListToRange(
-          chunk.map((host: any) => host.address["@addr"])
-        );
-        console.log("IP Range: ", ipRange);
-
-        fetchPingData(ipRange)
-          .then((data) => {
-            console.log("Ping Data: ", data);
-
-            // Sometimes host is missing, if all IPs are down.
-            if ("host" in data.result.nmaprun) {
-              const hosts = data.result.nmaprun.host;
-
-              // hosts can be an array, when multiple hosts are up. Otherwise, it's an object.
-              if (hosts.isArray) {
-                hosts.forEach((host: any) => {
-                  console.log("Host: ", host);
-                });
-              } else {
-                console.log("Host: ", hosts);
-              }
-            }
-          })
-          .finally(() => {
-            console.log("Ping scan completed");
-          });
+          // hosts can be an array, when multiple hosts are up. Otherwise, it's an object.
+          if (hosts.isArray) {
+            hosts.forEach((host: any) => {
+              console.log("Host UP: ", host);
+            });
+          } else {
+            console.log("Host UP: ", hosts);
+          }
+        }
+      })
+      .then(() => {
+        // TODO: only scan hosts that are up
+        const response_detailed = fetchDetailedData(scanFormData.ipAddress);
+        response_detailed.then((data) => {
+          console.log("Detailed Data: ", data);
+        });
       });
-    });
   };
 
   return (
@@ -133,9 +111,13 @@ const Home = () => {
                 <Form.Select
                   id="scanType"
                   size="sm"
-                  defaultValue="full"
+                  defaultValue=""
+                  value={scanFormData.scanType}
                   onChange={handleChange}
                 >
+                  <option value="" disabled>
+                    Select a Scan Profile...
+                  </option>
                   <option value="full">Full Vulnerability Scan</option>
                   <option value="ping">Ping Scan</option>
                   <option>Detailed Scan</option>

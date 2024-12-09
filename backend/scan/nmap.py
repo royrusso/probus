@@ -108,13 +108,14 @@ class NmapScanner(object):
                         "-oX",
                         "-",
                     ]
-                case ScanTypesEnum.DETAILED:  # TCP SYN scan
+                case ScanTypesEnum.DETAILED:  # TCP SYN scan nmap -sS --min-rate 2000 -oX -
                     flags = ["-sS", "--min-rate", "2000", "-oX", "-"]
                 case ScanTypesEnum.OS:  # Enable OS detection only
                     flags = ["-sS", "-O", "--min-rate", "2000", "-oX", "-"]
                 case ScanTypesEnum.LIST:  # List scan sudo nmap -sL 192.168.1.200-210
                     flags = ["-sL", "-oX", "-"]
                 case ScanTypesEnum.VULN:  # Probe open ports to determine service/version info and vuln scan
+                    # nmap --script vulners -sV -O --min-rate 2000 -oX -
                     flags = [
                         "--script",
                         "vulners",
