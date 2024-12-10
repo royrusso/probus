@@ -1,3 +1,4 @@
+from pydantic import ConfigDict
 from db import Base
 from sqlalchemy import TIMESTAMP, Column, String
 from sqlalchemy.sql import func
@@ -10,6 +11,8 @@ class Profile(Base):
     """
 
     __tablename__ = "profile"
+    model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
+
     profile_id = Column(String, primary_key=True, default=str(uuid.uuid4()))
     profile_name = Column(String, nullable=False)
     ip_range = Column(String, nullable=False)

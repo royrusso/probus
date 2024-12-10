@@ -10,11 +10,6 @@ class ProfileBaseSchema(BaseModel):
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
-    class Config:
-        orm_mode = True
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-
 
 class ListProfileResponse(BaseModel):
     status: str
