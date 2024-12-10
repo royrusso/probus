@@ -1,31 +1,35 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from api import scan, default, info
+from api import scan, default, info, profile
 from loguru import logger
+from db import engine
+from . import models
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
-def minerva_openapi_schema():
+def probus_openapi_schema():
     openapi_schema = get_openapi(
-        title="Minerva",
+        title="Probus",
         version="1.0",
-        description="Minerva API",
+        description="Probus API",
         routes=app.routes,
     )
     openapi_schema["info"] = {
-        "title": "Minerva REST API",
+        "title": "Probus REST API",
         "version": "1.0",
-        "description": "REST API for Minerva - a network security tool",
+        "description": "REST API for Probus - a network security tool",
         "contact": {
             "name": "Get Help with this API",
-            "url": "https://github.com/royrusso/minerva",
+            "url": "https://github.com/royrusso/probus",
             "email": "",
         },
         "license": {
             "name": "AGPL v3",
-            "url": "https://github.com/royrusso/minerva/blob/master/LICENSE",
+            "url": "https://github.com/royrusso/probus/blob/master/LICENSE",
         },
     }
     app.openapi_schema = openapi_schema
@@ -34,12 +38,13 @@ def minerva_openapi_schema():
 
 origins = ["*"]
 app = FastAPI()
+app.include_router(profile.router)
 app.include_router(scan.router)
 app.include_router(info.router)
 app.include_router(default.router)
 
 
-app.openapi = minerva_openapi_schema
+app.openapi = probus_openapi_schema
 
 # TODO: We should disable this and reverse proxy through the UI's dev server.
 #       That will match more closely with how we deploy and eliminate the need for CORS.

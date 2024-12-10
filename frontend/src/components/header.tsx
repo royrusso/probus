@@ -15,13 +15,14 @@ const Header = () => {
         data-bs-theme="dark"
       >
         <Container>
-          <Navbar.Brand href="#home">Minerva</Navbar.Brand>
+          <Navbar.Brand href="#home">Probus</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse
             id="basic-navbar-nav"
             className="justify-content-end"
           >
             <Nav className="justify-content-end">
+              <Nav.Link href="#home">Profiles</Nav.Link>
               <Nav.Link href="#home">Settings</Nav.Link>
               <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
@@ -37,7 +38,7 @@ const Header = () => {
                 </NavDropdown.Item>
               </NavDropdown>
               <Nav.Link
-                href="https://github.com/royrusso/minerva"
+                href="https://github.com/royrusso/probus"
                 target="_blank"
               >
                 <IconContext.Provider

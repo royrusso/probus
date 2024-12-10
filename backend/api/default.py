@@ -5,4 +5,4 @@ router = APIRouter()
 
 @router.get("/", tags=["default"])
 def read_root():
-    return {"Minerva says": "Hello World"}
+    return {"Probus says": "Hello World"}

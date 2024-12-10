@@ -1,8 +1,8 @@
-![Minerva Logo](frontend/src/assets/minerva_logo_300.png)
+# PROBUS
 
-[![codecov](https://codecov.io/github/royrusso/minerva/graph/badge.svg?token=B972KDOOOB)](https://codecov.io/github/royrusso/minerva)
-![Tests](https://img.shields.io/github/actions/workflow/status/royrusso/minerva/pytests_codecov.yml?label=Tests)
-![License](https://img.shields.io/github/license/royrusso/minerva)
+[![codecov](https://codecov.io/github/royrusso/probus/graph/badge.svg?token=B972KDOOOB)](https://codecov.io/github/royrusso/minerva)
+![Tests](https://img.shields.io/github/actions/workflow/status/royrusso/probus/pytests_codecov.yml?label=Tests)
+![License](https://img.shields.io/github/license/royrusso/probus)
 
 # This project is in early development!
 
@@ -20,9 +20,9 @@ A _FAST_ network scanner that identifies security vulnerabilities in your networ
 
 ## Introduction
 
-Minerva is a network scanner that identifies security vulnerabilities in your network and alerts you to new ones as they arise. Minerva scans your network quickly using a combination of Nmap and a 3-pass scanning technique to identify hosts and open ports. It then uses the CVE database to identify vulnerabilities on a per-device basis.
+Probus is a network scanner that identifies security vulnerabilities in your network and alerts you to new ones as they arise. Probus scans your network quickly using a combination of Nmap and a 3-pass scanning technique to identify hosts and open ports. It then uses the CVE database to identify vulnerabilities on a per-device basis.
 
-Minerva is platform-agnostic - built with a FastAPI backend and a React frontend - available as a Docker container.
+Probus is platform-agnostic - built with a FastAPI backend and a React frontend - available as a Docker container.
 
 ### Features:
 
@@ -50,4 +50,4 @@ Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information on 
 
 ## License
 
-Minerva is licensed under the [Apache License 2.0](LICENSE).
+Probus is licensed under the [Apache License 2.0](LICENSE).

@@ -38,6 +38,7 @@ const Home = () => {
     if (form.checkValidity() === false) {
       e.stopPropagation();
     }
+
     setValidated(true);
     if (scanFormData.ipAddress === "" || scanFormData.ipAddress === null) {
       console.log("IP Address is required");
@@ -86,46 +87,31 @@ const Home = () => {
 
   return (
     <>
-      <Container>
-        <Row className="justify-content-md-center">
-          <Col lg="6">
+      <Container
+        fluid
+        className="vh-100 d-flex justify-content-center align-items-center"
+      >
+        <Row className="w-50">
+          <Col className="mb-5">
             <Form
-              className="pt-3 w-100"
+              className="w-100 mb-5"
               onSubmit={handleScan}
               noValidate
               validated={validated}
             >
-              <InputGroup hasValidation>
+              <InputGroup>
                 <Form.Control
-                  placeholder="IP Address Range"
-                  size="sm"
+                  placeholder="Enter IP Address or Range to begin scanning..."
                   type="text"
                   id="ipAddress"
                   onChange={handleChange}
                   value={scanFormData.ipAddress}
                   required
+                  aria-describedby="ipAddressHelpText"
                 />
-                <Form.Control.Feedback type="invalid" tooltip>
-                  Please enter a valid IP Address or Range
-                </Form.Control.Feedback>
-                <Form.Select
-                  id="scanType"
-                  size="sm"
-                  defaultValue=""
-                  value={scanFormData.scanType}
-                  onChange={handleChange}
-                >
-                  <option value="" disabled>
-                    Select a Scan Profile...
-                  </option>
-                  <option value="full">Full Vulnerability Scan</option>
-                  <option value="ping">Ping Scan</option>
-                  <option>Detailed Scan</option>
-                  <option>OS-only Scan</option>
-                </Form.Select>
                 <Button variant="primary" id="button-beginscan" type="submit">
                   Scan
-                </Button>
+                </Button>{" "}
               </InputGroup>{" "}
               <Form.Text id="ipAddressHelpText" className="formfield-help">
                 e.g. 192.168.0-255 or 192.168.0/24
