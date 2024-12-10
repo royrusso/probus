@@ -2,7 +2,7 @@
 
 [![codecov](https://codecov.io/github/royrusso/probus/graph/badge.svg?token=B972KDOOOB)](https://codecov.io/github/royrusso/probus)
 ![Tests](https://img.shields.io/github/actions/workflow/status/royrusso/probus/pytests_codecov.yml?label=Tests)
-![License](https://img.shields.io/github/license/royrusso/probus)
+![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)
 
 # This project is in early development!
 
