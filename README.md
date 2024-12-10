@@ -1,6 +1,6 @@
 # PROBUS
 
-[![codecov](https://codecov.io/github/royrusso/probus/graph/badge.svg?token=B972KDOOOB)](https://codecov.io/github/royrusso/minerva)
+[![codecov](https://codecov.io/github/royrusso/probus/graph/badge.svg?token=B972KDOOOB)](https://codecov.io/github/royrusso/probus)
 ![Tests](https://img.shields.io/github/actions/workflow/status/royrusso/probus/pytests_codecov.yml?label=Tests)
 ![License](https://img.shields.io/github/license/royrusso/probus)
 
