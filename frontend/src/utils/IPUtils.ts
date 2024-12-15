@@ -25,3 +25,34 @@ export const IPListToRange = (ipList: string[]): string => {
 
   return ipRange;
 };
+
+export const isValidIPv4Range = (ip: string): boolean => {
+  const ipRangeArray = ip.split(".");
+  if (ipRangeArray.length !== 4) {
+    return false;
+  }
+
+  const range = ipRangeArray[3];
+  const rangeArray = range.split("-");
+  if (rangeArray.length === 2) {
+    const start = rangeArray[0];
+    const end = rangeArray[1];
+    if (
+      isNaN(parseInt(start)) ||
+      isNaN(parseInt(end)) ||
+      parseInt(start) > parseInt(end)
+    ) {
+      return false;
+    }
+  }
+
+  const cidrArray = range.split("/");
+  if (cidrArray.length === 2) {
+    const cidr = cidrArray[1];
+    if (parseInt(cidr) > 32) {
+      return false;
+    }
+  }
+
+  return true;
+};

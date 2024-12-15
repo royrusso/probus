@@ -4,6 +4,8 @@ import subprocess
 from loguru import logger
 import xmltodict
 import json
+from sqlalchemy.orm import Session
+from backend import models
 from .nmap_utils import is_root
 
 
@@ -150,6 +152,28 @@ class NmapScanner(object):
         self.target = target
         self.scan_type = "list"
         return self.__scan()
+
+    @is_root
+    def scan_profile(self, profile_id: str, db: Session) -> str:
+        """
+        Given a profile ID, scan the target IP address(es) and return the results.
+        """
+        profile = db.query(models.Profile).filter(models.Profile.profile_id == profile_id).first()
+        if not profile:
+            logger.error("Profile not found.")
+            return None
+
+        # get the target IP address(es) from the profile
+        self.target = profile.ip_range
+        self.scan_type = "detailed"
+        if not self.target or not self.scan_type:
+            logger.error("Target and scan type must be provided.")
+            return "Target and scan type must be provided."
+
+        # scan the target IP address(es)
+        scan_result_xml = self.__scan()
+
+        return scan_result_xml
 
     @is_root
     def scan(self, target: str, type: str) -> str:

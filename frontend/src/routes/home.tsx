@@ -1,88 +1,100 @@
+import { generateSlug } from "random-word-slugs";
 import { useState } from "react";
 import {
+  Alert,
   Button,
   Col,
   Container,
   Form,
   InputGroup,
   Row,
-  Toast,
 } from "react-bootstrap";
-import { fetchDetailedData, fetchPingData } from "../services/Client";
+import { useNavigate } from "react-router-dom";
+import { createProfile } from "../services/Client";
+import { Profile } from "../types/probus";
+import { isValidIPv4Range } from "../utils/IPUtils";
 
 const Home = () => {
+  const navigate = useNavigate();
   const [scanFormData, setScanFormData] = useState({
     ipAddress: "",
-    scanType: "",
   });
-  const [validated, setValidated] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [results, setResults] = useState<any[]>([]);
-  const [scanFormToastMessage, setScanFormToastMessage] = useState("");
+  const [validIP, setValidIP] = useState(true);
+  // const [showToast, setShowToast] = useState(false);
+  // const [scanFormToastMessage, setScanFormToastMessage] = useState("");
 
   const handleChange = (e: { target: { id: any; value: any } }) => {
     const { id, value } = e.target;
     setScanFormData({ ...scanFormData, [id]: value });
   };
 
-  const handleScan = (e: {
+  const handleSubmit = (e: {
     preventDefault: () => void;
     currentTarget: any;
     stopPropagation: () => void;
   }) => {
     e.preventDefault();
 
-    console.log("Scan Form Data: ", scanFormData);
-
-    const form = e.currentTarget;
-    if (form.checkValidity() === false) {
+    if (!isValidIPv4Range(scanFormData.ipAddress)) {
+      setValidIP(false);
       e.stopPropagation();
-    }
-
-    setValidated(true);
-    if (scanFormData.ipAddress === "" || scanFormData.ipAddress === null) {
-      console.log("IP Address is required");
       return;
     }
 
-    setShowToast(true);
-    setScanFormToastMessage(
-      `Scan started for IP Address(es): ${scanFormData.ipAddress}`
-    );
+    setValidIP(true);
 
-    const fetchScanData = async (ipRange: string) => {
-      console.log("Scanning IP Range: ", ipRange);
-      let scanData = await fetchPingData(ipRange);
-      setResults((prevResults) => [...prevResults, scanData]);
-      return scanData;
-    };
+    // Create a new profile
+    const result = createProfile({
+      profile_name: generateSlug(2, { format: "title" }),
+      ip_range: scanFormData.ipAddress,
+    } as Profile);
 
-    const response = fetchScanData(scanFormData.ipAddress);
-    response
-      .then((data) => {
-        console.log("Ping Data: ", data);
-
-        // Sometimes host is missing, if all IPs are down.
-        if ("host" in data.result.nmaprun) {
-          const hosts = data.result.nmaprun.host;
-
-          // hosts can be an array, when multiple hosts are up. Otherwise, it's an object.
-          if (hosts.isArray) {
-            hosts.forEach((host: any) => {
-              console.log("Host UP: ", host);
-            });
-          } else {
-            console.log("Host UP: ", hosts);
-          }
-        }
-      })
-      .then(() => {
-        // TODO: only scan hosts that are up
-        const response_detailed = fetchDetailedData(scanFormData.ipAddress);
-        response_detailed.then((data) => {
-          console.log("Detailed Data: ", data);
-        });
+    result.then((resp) => {
+      console.log("Profile Created: ", resp);
+      navigate("/results/" + resp.data.profile_id, {
+        state: { data: resp.data },
       });
+    });
+
+    //    navigate("/results", { state: scanFormData }); // Navigate to the new view
+    // setShowToast(true);
+    // setScanFormToastMessage(
+    //   `Scan started for IP Address(es): ${scanFormData.ipAddress}`
+    // );
+
+    // const fetchScanData = async (ipRange: string) => {
+    //   console.log("Scanning IP Range: ", ipRange);
+    //   let scanData = await fetchPingData(ipRange);
+    //   setResults((prevResults) => [...prevResults, scanData]);
+    //   return scanData;
+    // };
+
+    // const response = fetchScanData(scanFormData.ipAddress);
+    // response
+    //   .then((data) => {
+    //     console.log("Ping Data: ", data);
+
+    //     // Sometimes host is missing, if all IPs are down.
+    //     if ("host" in data.result.nmaprun) {
+    //       const hosts = data.result.nmaprun.host;
+
+    //       // hosts can be an array, when multiple hosts are up. Otherwise, it's an object.
+    //       if (hosts.isArray) {
+    //         hosts.forEach((host: any) => {
+    //           console.log("Host UP: ", host);
+    //         });
+    //       } else {
+    //         console.log("Host UP: ", hosts);
+    //       }
+    //     }
+    //   })
+    //   .then(() => {
+    //     // TODO: only scan hosts that are up
+    //     const response_detailed = fetchDetailedData(scanFormData.ipAddress);
+    //     response_detailed.then((data) => {
+    //       console.log("Detailed Data: ", data);
+    //     });
+    //   });
   };
 
   return (
@@ -93,31 +105,34 @@ const Home = () => {
       >
         <Row className="w-50">
           <Col className="mb-5">
-            <Form
-              className="w-100 mb-5"
-              onSubmit={handleScan}
-              noValidate
-              validated={validated}
-            >
-              <InputGroup>
-                <Form.Control
-                  placeholder="Enter IP Address or Range to begin scanning..."
-                  type="text"
-                  id="ipAddress"
-                  onChange={handleChange}
-                  value={scanFormData.ipAddress}
-                  required
-                  aria-describedby="ipAddressHelpText"
-                />
-                <Button variant="primary" id="button-beginscan" type="submit">
-                  Scan
-                </Button>{" "}
-              </InputGroup>{" "}
-              <Form.Text id="ipAddressHelpText" className="formfield-help">
-                e.g. 192.168.0-255 or 192.168.0/24
-              </Form.Text>
+            <Form className="w-100 mb-5" onSubmit={handleSubmit} noValidate>
+              <Alert variant="secondary">
+                {" "}
+                <InputGroup>
+                  <Form.Control
+                    placeholder="Enter IP Address or Range to begin scanning..."
+                    type="text"
+                    id="ipAddress"
+                    onChange={handleChange}
+                    value={scanFormData.ipAddress}
+                    required
+                    aria-describedby="ipAddressHelpText"
+                    isInvalid={!validIP}
+                  />
+                  <Form.Control.Feedback type="invalid" tooltip>
+                    Invalid IP Address or Range
+                  </Form.Control.Feedback>
+                  <Button variant="primary" id="button-beginscan" type="submit">
+                    Scan
+                  </Button>{" "}
+                </InputGroup>{" "}
+                <Form.Text id="ipAddressHelpText" className="formfield-help">
+                  e.g. 192.168.1.0-255 or 192.168.1.0/24
+                </Form.Text>
+              </Alert>
             </Form>
-            <Toast
+
+            {/* <Toast
               bg="success"
               delay={5000}
               autohide
@@ -129,7 +144,7 @@ const Home = () => {
                 <strong className="me-auto">Scan Started</strong>
               </Toast.Header>
               <Toast.Body>{scanFormToastMessage}</Toast.Body>
-            </Toast>
+            </Toast> */}
           </Col>
         </Row>
       </Container>

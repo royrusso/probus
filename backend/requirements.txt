@@ -5,8 +5,8 @@ fastapi[standard]~=0.115.4
 uvicorn~=0.32.0
 FindMyIP~=1.2.0
 SQLAlchemy~=2.0.36
-sqlmodel~=0.0.22
 pydantic~=2.10.3
+sqlalchemy
 fastapi-utils
 
 # Testing

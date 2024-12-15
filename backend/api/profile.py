@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, status
 from backend import models, schemas
 from backend.db import get_db
@@ -30,6 +31,7 @@ def create_profile(profile: schemas.ProfileBaseSchema, db: Session = Depends(get
     Create a new profile.
     """
     db_profile = models.Profile(**profile.model_dump())
+    db_profile.profile_id = str(uuid.uuid4())
     db.add(db_profile)
     db.commit()
     db.refresh(db_profile)

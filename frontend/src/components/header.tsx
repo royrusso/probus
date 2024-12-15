@@ -15,14 +15,16 @@ const Header = () => {
         data-bs-theme="dark"
       >
         <Container>
-          <Navbar.Brand href="#home">Probus</Navbar.Brand>
+          <Navbar.Brand href="/">
+            {"{"} Probus {"}"}
+          </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse
             id="basic-navbar-nav"
             className="justify-content-end"
           >
             <Nav className="justify-content-end">
-              <Nav.Link href="#home">Profiles</Nav.Link>
+              <Nav.Link href="/profiles">Profiles</Nav.Link>
               <Nav.Link href="#home">Settings</Nav.Link>
               <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>

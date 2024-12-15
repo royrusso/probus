@@ -1,7 +1,21 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from backend.db import get_db
 from scan.nmap import NmapScanner
+from sqlalchemy.orm import Session
 
 router = APIRouter()
+
+
+@router.get("/scan/profile/ping/{profile_id}", tags=["scan"])
+async def scan_profile(profile_id: str, db: Session = Depends(get_db)):
+    """
+    Scan the target profile for ping and traceroute.
+
+    In NMap terms, it runs a basic no-port-scan (nmap -sn --traceroute).
+    """
+    nmap_scanner = NmapScanner()
+    result = nmap_scanner.scan_profile(profile_id, db)
+    return {"result": result}
 
 
 @router.get("/scan/detailed/{ip_address:path}", tags=["scan"])
