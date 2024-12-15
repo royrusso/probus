@@ -6,7 +6,9 @@
 
 # This project is in early development!
 
-A _FAST_ network scanner that identifies security vulnerabilities in your network and alerts you to new ones as they arise.
+A _FAST_ network monitor and UI that actively scans and alerts you
+to network changes, new devices, open ports, and identifies CVEs
+(Common Vulnerabilities and Exposures)
 
 ## Table of Contents
 
