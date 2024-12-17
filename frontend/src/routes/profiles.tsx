@@ -42,7 +42,7 @@ const Profiles = () => {
     try {
       const response = fetchProfileList();
       const resp = await response;
-      setData(resp.data);
+      setData(resp);
     } catch (error) {
       console.error("Error fetching data:", error);
     }

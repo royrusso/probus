@@ -53,3 +53,9 @@ export const fetchIPList = async (ip_arg: string) => {
   const data = await response.json();
   return data;
 };
+
+export const scanProfile = async (profileId: string) => {
+  const response = await fetch(`${BASE_URI}/scan/profile/${profileId}`);
+  const data = await response.json();
+  return data;
+};

@@ -1,6 +1,19 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
+
+
+class ProfileRead(BaseModel):
+    profile_id: str
+    profile_name: str
+    profile_description: Optional[str] = None
+    ip_range: str
+    last_scan: Optional[datetime] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
 
 
 class ProfileBaseSchema(BaseModel):

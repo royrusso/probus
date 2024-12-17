@@ -1,12 +1,14 @@
 from enum import Enum
 import os
 import subprocess
+import uuid
 from loguru import logger
 import xmltodict
 import json
 from sqlalchemy.orm import Session
 from backend import models
 from .nmap_utils import is_root
+from datetime import datetime
 
 
 class ScanTypesEnum(str, Enum):
@@ -156,7 +158,7 @@ class NmapScanner(object):
     @is_root
     def scan_profile(self, profile_id: str, db: Session) -> str:
         """
-        Given a profile ID, scan the target IP address(es) and return the results.
+        Given a profile ID, scan the target IP address(es), stores the results, and returns them.
         """
         profile = db.query(models.Profile).filter(models.Profile.profile_id == profile_id).first()
         if not profile:
@@ -170,10 +172,29 @@ class NmapScanner(object):
             logger.error("Target and scan type must be provided.")
             return "Target and scan type must be provided."
 
-        # scan the target IP address(es)
-        scan_result_xml = self.__scan()
+        try:
+            scan_result_json = self.__scan()
 
-        return scan_result_xml
+            if scan_result_json:
+                profile.last_scan = datetime.now()
+
+                scan_event = models.ScanEvent(profile_id=profile.profile_id)
+                scan_event.scan_command = scan_result_json["nmaprun"]["@args"]
+                scan_event.scan_start = scan_result_json["nmaprun"]["@start"]
+                scan_event.scan_end = scan_result_json["nmaprun"]["runstats"]["finished"]["@time"]
+                scan_event.scan_status = scan_result_json["nmaprun"]["runstats"]["finished"]["@exit"]
+                scan_event.profile_id = profile.profile_id
+                scan_event.scan_id = str(uuid.uuid4())
+                scan_event.profile = profile
+                profile.scan_events.append(scan_event)
+
+                db.commit()
+
+        except Exception as e:
+            logger.error("Error: {}".format(e))
+            return None
+
+        return profile
 
     @is_root
     def scan(self, target: str, type: str) -> str:

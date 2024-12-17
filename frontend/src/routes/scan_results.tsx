@@ -12,8 +12,31 @@ import { IconContext } from "react-icons";
 import { FaListUl, FaRegEdit } from "react-icons/fa";
 import { IoRefresh } from "react-icons/io5";
 import { useParams } from "react-router-dom";
-import { fetchProfile } from "../services/Client";
+import { fetchProfile, scanProfile } from "../services/Client";
 import { Profile } from "../types/probus";
+import formatDateTime from "../utils/Tools";
+
+const LatestScan = ({ profile }: { profile: Profile }) => {
+  return (
+    <div className="text-muted">
+      <small>
+        Latest Scan:{" "}
+        {profile.last_scan ? formatDateTime(profile.last_scan) : "N/A"}
+      </small>
+    </div>
+  );
+};
+
+const ReRunSpinner = () => {
+  return (
+    <span
+      className="spinner-border spinner-border-sm"
+      role="status"
+      aria-hidden="true"
+      id="rerun_spinner"
+    ></span>
+  );
+};
 
 const ScanResults = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -21,20 +44,36 @@ const ScanResults = () => {
 
   if (!profile_id) {
     console.error("Profile ID is missing!");
-    // TODO
     return;
   }
 
   useEffect(() => {
     fetchProfile(profile_id).then((resp) => {
-      console.log("Profile Data: ", resp.data);
-      setProfile(resp.data);
+      console.log("Profile Data: ", resp);
+      setProfile(resp);
     });
   }, []);
 
-  // if (profile && profile.last_scan === null) {
-  //   console.log("Last scan is undefined. Running First Scan!");
-  // }
+  const [isScanning, setIsScanning] = useState(false);
+
+  const rerunScan = () => {
+    setIsScanning(true);
+
+    // disable the rerun button
+    const rerunButton = document.getElementById("rerun-scan");
+    if (rerunButton) {
+      rerunButton.setAttribute("disabled", "true");
+    }
+
+    scanProfile(profile_id).then((resp) => {
+      console.log("Scan Result: ", resp);
+
+      setIsScanning(false);
+      rerunButton?.removeAttribute("disabled");
+
+      setProfile({ ...resp });
+    });
+  };
 
   return (
     <>
@@ -49,7 +88,8 @@ const ScanResults = () => {
                 <OverlayTrigger
                   overlay={<Tooltip>Re-run this Profile</Tooltip>}
                 >
-                  <Button>
+                  <Button onClick={rerunScan} id="rerun-scan">
+                    {isScanning ? <ReRunSpinner /> : null}
                     <IconContext.Provider
                       value={{ className: "react-icon-button" }}
                     >
@@ -85,7 +125,7 @@ const ScanResults = () => {
               </div>
             </Col>
             <Col className="text-end">
-              <small>Last Scan: {profile.last_scan}</small>
+              <LatestScan profile={profile} />
             </Col>
           </Row>
         </Container>

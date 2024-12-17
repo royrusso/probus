@@ -51,50 +51,10 @@ const Home = () => {
 
     result.then((resp) => {
       console.log("Profile Created: ", resp);
-      navigate("/results/" + resp.data.profile_id, {
-        state: { data: resp.data },
+      navigate("/results/" + resp.profile_id, {
+        state: { data: resp },
       });
     });
-
-    //    navigate("/results", { state: scanFormData }); // Navigate to the new view
-    // setShowToast(true);
-    // setScanFormToastMessage(
-    //   `Scan started for IP Address(es): ${scanFormData.ipAddress}`
-    // );
-
-    // const fetchScanData = async (ipRange: string) => {
-    //   console.log("Scanning IP Range: ", ipRange);
-    //   let scanData = await fetchPingData(ipRange);
-    //   setResults((prevResults) => [...prevResults, scanData]);
-    //   return scanData;
-    // };
-
-    // const response = fetchScanData(scanFormData.ipAddress);
-    // response
-    //   .then((data) => {
-    //     console.log("Ping Data: ", data);
-
-    //     // Sometimes host is missing, if all IPs are down.
-    //     if ("host" in data.result.nmaprun) {
-    //       const hosts = data.result.nmaprun.host;
-
-    //       // hosts can be an array, when multiple hosts are up. Otherwise, it's an object.
-    //       if (hosts.isArray) {
-    //         hosts.forEach((host: any) => {
-    //           console.log("Host UP: ", host);
-    //         });
-    //       } else {
-    //         console.log("Host UP: ", hosts);
-    //       }
-    //     }
-    //   })
-    //   .then(() => {
-    //     // TODO: only scan hosts that are up
-    //     const response_detailed = fetchDetailedData(scanFormData.ipAddress);
-    //     response_detailed.then((data) => {
-    //       console.log("Detailed Data: ", data);
-    //     });
-    //   });
   };
 
   return (

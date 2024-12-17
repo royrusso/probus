@@ -3,29 +3,30 @@ from fastapi import APIRouter, Depends, status
 from backend import models, schemas
 from backend.db import get_db
 from sqlalchemy.orm import Session
+from backend.schemas import ProfileRead
 
 router = APIRouter()
 
 
-@router.get("/profile/{profile_id}", tags=["profile"])
+@router.get("/profile/{profile_id}", response_model=ProfileRead, tags=["profile"])
 def get_profile(profile_id: str, db: Session = Depends(get_db)):
     """
     Get a profile by ID.
     """
     profile = db.query(models.Profile).filter(models.Profile.profile_id == profile_id).first()
-    return {"status": "success", "data": profile}
+    return profile
 
 
-@router.get("/profiles", tags=["profile"])
+@router.get("/profiles", response_model=list[ProfileRead], tags=["profile"])
 def get_profiles(db: Session = Depends(get_db)):
     """
     Get all profiles.
     """
     profiles = db.query(models.Profile).all()
-    return {"status": "success", "data": profiles}
+    return [ProfileRead.model_validate(profile) for profile in profiles]
 
 
-@router.post("/profile", status_code=status.HTTP_201_CREATED, tags=["profile"])
+@router.post("/profile", response_model=ProfileRead, status_code=status.HTTP_201_CREATED, tags=["profile"])
 def create_profile(profile: schemas.ProfileBaseSchema, db: Session = Depends(get_db)):
     """
     Create a new profile.
@@ -35,7 +36,7 @@ def create_profile(profile: schemas.ProfileBaseSchema, db: Session = Depends(get
     db.add(db_profile)
     db.commit()
     db.refresh(db_profile)
-    return {"status": "success", "data": db_profile}
+    return db_profile
 
 
 @router.patch("/profile/{profile_id}", tags=["profile"])
