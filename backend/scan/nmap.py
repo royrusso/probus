@@ -113,7 +113,7 @@ class NmapScanner(object):
                         "-",
                     ]
                 case ScanTypesEnum.DETAILED:  # TCP SYN scan nmap -sS --min-rate 2000 -oX -
-                    flags = ["-sS", "--min-rate", "2000", "-oX", "-"]
+                    flags = ["-sS", "-Pn", "--min-rate", "2000", "-oX", "-"]
                 case ScanTypesEnum.OS:  # Enable OS detection only
                     flags = ["-sS", "-O", "--min-rate", "2000", "-oX", "-"]
                 case ScanTypesEnum.LIST:  # List scan sudo nmap -sL 192.168.1.200-210
@@ -227,7 +227,7 @@ class NmapScanner(object):
         logger.info("Running command: {}".format(" ".join(command)))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
-            stdout, stderr = process.communicate(timeout=300)  # TODO: timeout should be configurable
+            stdout, stderr = process.communicate(timeout=30)  # TODO: timeout should be configurable
             # logger.info("Scan Results: {}".format(stdout.decode("utf-8")))
             json_stdout_response = json.dumps(xmltodict.parse(stdout.decode("utf-8")), indent=4)
 

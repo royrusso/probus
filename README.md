@@ -38,6 +38,14 @@ Probus is platform-agnostic - built with a FastAPI backend and a React frontend 
 
 Download the Docker from: TODO
 
+UI is accessible from: [http://localhost:8080](http://localhost:8080).
+
+Swagger API is accessible from: [http://localhost:8000/docs](http://localhost:8000/docs).
+
+### Local Installation from Sources
+
+Clone the repository. Then, run `docker-compose up --build`.
+
 ## Development
 
 Please read the [DEVELOPMENT.md](DEVELOPMENT.md) file for more information on how to run this project locally.

@@ -4,7 +4,7 @@ from fastapi.openapi.utils import get_openapi
 from api import scan, default, info, profile
 from loguru import logger
 from db import engine
-from . import models
+from backend import models
 
 models.Base.metadata.create_all(bind=engine)
 

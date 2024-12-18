@@ -32,7 +32,7 @@ import formatDateTime from "../utils/Tools";
 
 const Profiles = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState<Profile[]>([]);
+  const [profiles, setData] = useState<Profile[]>([]);
 
   useEffect(() => {
     fetchData();
@@ -116,7 +116,7 @@ const Profiles = () => {
     }),
   ];
   const profilesTable = useReactTable({
-    data,
+    data: profiles,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(), //provide a sorting row model
@@ -138,130 +138,147 @@ const Profiles = () => {
 
   return (
     <>
-      <Container className="mt-5">
-        <Row>
-          <Col>
-            <h2>Scan Profiles</h2>
-          </Col>
-          <Col className="text-end"></Col>
-        </Row>
-        <Row>
-          <Col>
-            <div className="p-2">
-              <BTable striped bordered hover responsive>
-                <thead>
-                  {profilesTable.getHeaderGroups().map((headerGroup) => (
-                    <tr key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => (
-                        <th
-                          key={header.id}
-                          colSpan={header.colSpan}
-                          className={
-                            "text-lg " +
-                            (header.column.getCanSort()
-                              ? "cursor-pointer select-none"
-                              : "cursor-help")
-                          }
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                          {{
-                            asc: (
-                              <IconContext.Provider
-                                value={{
-                                  className: "react-icon-button",
-                                }}
-                              >
-                                <FaSortUp />
-                              </IconContext.Provider>
-                            ),
-                            desc: (
-                              <IconContext.Provider
-                                value={{
-                                  className: "react-icon-button",
-                                }}
-                              >
-                                <FaSortDown />
-                              </IconContext.Provider>
-                            ),
-                          }[header.column.getIsSorted() as string] ?? null}
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-                <tbody>
-                  {profilesTable.getRowModel().rows.map((row) => (
-                    <tr key={row.id}>
-                      {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="align-middle">
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  {profilesTable.getFooterGroups().map((footerGroup) => (
-                    <tr key={footerGroup.id}>
-                      {footerGroup.headers.map((header) => (
-                        <th key={header.id} colSpan={header.colSpan}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.footer,
-                                header.getContext()
-                              )}
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </tfoot>
-              </BTable>
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <p>
-              Page {profilesTable.getState().pagination.pageIndex + 1} of{" "}
-              {profilesTable.getPageCount()}. Total{" "}
-              {profilesTable.getRowCount()} profiles.
-              {/* {tableInstance.getState().pagination.pageSize} Per Page. */}
-            </p>
-          </Col>
-          <Col className="text-end">
-            <ButtonGroup>
-              <Button
-                onClick={() => profilesTable.previousPage()}
-                disabled={!profilesTable.getCanPreviousPage()}
-              >
-                <IconContext.Provider
-                  value={{ className: "react-icon-button" }}
+      {/* if profiles !empty */}
+      {profiles.length > 0 ? (
+        <Container className="mt-5">
+          <Row>
+            <Col>
+              <h2>Scan Profiles</h2>
+            </Col>
+            <Col className="text-end"></Col>
+          </Row>
+          <Row>
+            <Col>
+              <div className="p-2">
+                <BTable striped bordered hover responsive>
+                  <thead>
+                    {profilesTable.getHeaderGroups().map((headerGroup) => (
+                      <tr key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => (
+                          <th
+                            key={header.id}
+                            colSpan={header.colSpan}
+                            className={
+                              "text-lg " +
+                              (header.column.getCanSort()
+                                ? "cursor-pointer select-none"
+                                : "cursor-help")
+                            }
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                            {{
+                              asc: (
+                                <IconContext.Provider
+                                  value={{
+                                    className: "react-icon-button",
+                                  }}
+                                >
+                                  <FaSortUp />
+                                </IconContext.Provider>
+                              ),
+                              desc: (
+                                <IconContext.Provider
+                                  value={{
+                                    className: "react-icon-button",
+                                  }}
+                                >
+                                  <FaSortDown />
+                                </IconContext.Provider>
+                              ),
+                            }[header.column.getIsSorted() as string] ?? null}
+                          </th>
+                        ))}
+                      </tr>
+                    ))}
+                  </thead>
+                  <tbody>
+                    {profilesTable.getRowModel().rows.map((row) => (
+                      <tr key={row.id}>
+                        {row.getVisibleCells().map((cell) => (
+                          <td key={cell.id} className="align-middle">
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    {profilesTable.getFooterGroups().map((footerGroup) => (
+                      <tr key={footerGroup.id}>
+                        {footerGroup.headers.map((header) => (
+                          <th key={header.id} colSpan={header.colSpan}>
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.footer,
+                                  header.getContext()
+                                )}
+                          </th>
+                        ))}
+                      </tr>
+                    ))}
+                  </tfoot>
+                </BTable>
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <p>
+                Page {profilesTable.getState().pagination.pageIndex + 1} of{" "}
+                {profilesTable.getPageCount()}. Total{" "}
+                {profilesTable.getRowCount()} profiles.
+                {/* {tableInstance.getState().pagination.pageSize} Per Page. */}
+              </p>
+            </Col>
+            <Col className="text-end">
+              <ButtonGroup>
+                <Button
+                  onClick={() => profilesTable.previousPage()}
+                  disabled={!profilesTable.getCanPreviousPage()}
                 >
-                  <GrCaretPrevious />
-                </IconContext.Provider>
-              </Button>
-              <Button
-                onClick={() => profilesTable.nextPage()}
-                disabled={!profilesTable.getCanNextPage()}
-              >
-                <IconContext.Provider
-                  value={{ className: "react-icon-button" }}
+                  <IconContext.Provider
+                    value={{ className: "react-icon-button" }}
+                  >
+                    <GrCaretPrevious />
+                  </IconContext.Provider>
+                </Button>
+                <Button
+                  onClick={() => profilesTable.nextPage()}
+                  disabled={!profilesTable.getCanNextPage()}
                 >
-                  <GrCaretNext />
-                </IconContext.Provider>
-              </Button>
-            </ButtonGroup>
-          </Col>
-        </Row>
-      </Container>
+                  <IconContext.Provider
+                    value={{ className: "react-icon-button" }}
+                  >
+                    <GrCaretNext />
+                  </IconContext.Provider>
+                </Button>
+              </ButtonGroup>
+            </Col>
+          </Row>
+        </Container>
+      ) : (
+        <Container
+          fluid
+          className="vh-100 d-flex justify-content-center align-items-center"
+        >
+          <Row className="w-50">
+            <Col className="mb-5 text-center">
+              <div className="text-warning">
+                No Profiles Found. Create one by starting a new scan{" "}
+                <a href="/">here</a>.
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      )}
     </>
   );
 };

@@ -130,7 +130,16 @@ const ScanResults = () => {
           </Row>
         </Container>
       ) : (
-        <div>Loading...</div>
+        <Container
+          fluid
+          className="vh-100 d-flex justify-content-center align-items-center"
+        >
+          <Row className="w-50">
+            <Col className="mb-5 text-center">
+              <div className="text-warning">Error. Profile not found.</div>
+            </Col>
+          </Row>
+        </Container>
       )}
     </>
   );
