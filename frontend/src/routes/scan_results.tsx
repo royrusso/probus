@@ -65,14 +65,22 @@ const ScanResults = () => {
       rerunButton.setAttribute("disabled", "true");
     }
 
-    scanProfile(profile_id).then((resp) => {
-      console.log("Scan Result: ", resp);
+    scanProfile(profile_id)
+      .then((resp) => {
+        console.log("Scan Result: ", resp);
 
-      setIsScanning(false);
-      rerunButton?.removeAttribute("disabled");
+        setIsScanning(false);
+        rerunButton?.removeAttribute("disabled");
 
-      setProfile({ ...resp });
-    });
+        setProfile({ ...resp });
+      })
+      .catch((err) => {
+        console.error("Error while scanning profile: ", err);
+        setIsScanning(false);
+        rerunButton?.removeAttribute("disabled");
+
+        // TODO: alert on error in UI
+      });
   };
 
   return (

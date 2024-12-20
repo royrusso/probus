@@ -44,7 +44,7 @@ Swagger API is accessible from: [http://localhost:8000/docs](http://localhost:80
 
 ### Local Installation from Sources
 
-Clone the repository. Then, run `docker-compose up --build`.
+Clone the repository. Then, run `docker compose up --build`.
 
 ## Development
 

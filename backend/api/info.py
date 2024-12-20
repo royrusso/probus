@@ -2,7 +2,7 @@ import os
 from fastapi import APIRouter
 import FindMyIP as ip
 from loguru import logger
-from scan.nmap import NmapScanner
+from service.nmap import NmapScanner
 
 router = APIRouter()
 

@@ -13,6 +13,7 @@ def get_profile(profile_id: str, db: Session = Depends(get_db)):
     """
     Get a profile by ID.
     """
+
     profile = db.query(models.Profile).filter(models.Profile.profile_id == profile_id).first()
     return profile
 

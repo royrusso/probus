@@ -6,16 +6,8 @@ from db import Base
 from sqlalchemy.sql import func
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
-from typing import List
-
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
 
 
 class Profile(Base):
@@ -31,7 +23,7 @@ class Profile(Base):
     last_scan: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), nullable=False)
     updated_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
-    scan_events: Mapped[List["ScanEvent"]] = relationship(back_populates="profile")
+    scan_events: Mapped[List["ScanEvent"]] = relationship(back_populates="profile", lazy="dynamic")
 
 
 class ScanEvent(Base):
@@ -40,43 +32,47 @@ class ScanEvent(Base):
     """
 
     __tablename__ = "scan"
-    scan_id: Mapped[str] = mapped_column(primary_key=True)
+    scan_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False)
     profile_id: Mapped[str] = mapped_column(ForeignKey("profile.profile_id"))
+    scan_command: Mapped[str] = mapped_column(String, nullable=False)  # "@args": "/opt/homebrew/bin/nmap -sn -T4 -oX -
+    scan_start: Mapped[int] = mapped_column(Integer, nullable=False)
+    scan_end: Mapped[int] = mapped_column(Integer, nullable=False)
+    scan_status: Mapped[str] = mapped_column(String, nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), nullable=False)
     profile: Mapped[Profile] = relationship("Profile", back_populates="scan_events")
-    scan_command: Mapped[str] = mapped_column(String, nullable=True)  # "@args": "/opt/homebrew/bin/nmap -sn -T4 -oX -
-    scan_start: Mapped[int] = mapped_column(Integer, nullable=True)
-    scan_end: Mapped[int] = mapped_column(Integer, nullable=True)
-    scan_status: Mapped[str] = mapped_column(String, nullable=True)
+    hosts: Mapped[List["Host"]] = relationship(back_populates="scan")
 
 
-# class Host(Base):
-#     """
-#     A host is just a device on the network found during a scan event.
-#     """
+class Host(Base):
+    """
+    A host is just a device on the network found during a scan event. One Scan can have many hosts.
+    """
 
-#     __tablename__ = "host"
-#     host_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-#     scan_id = Column(UUID(as_uuid=True), nullable=False)
-#     start_time = Column(DateTime, nullable=False)
-#     end_time = Column(DateTime, nullable=False)
-#     state = Column(String, nullable=False)
-#     reason = Column(String, nullable=True)
-#     created_at = Column(DateTime, default=func.now(), nullable=False)
+    __tablename__ = "host"
+    host_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    scan_id: Mapped[int] = mapped_column(ForeignKey("scan.scan_id"))
+    start_time: Mapped[int] = mapped_column(Integer, nullable=False)
+    end_time: Mapped[int] = mapped_column(Integer, nullable=False)
+    state: Mapped[str] = mapped_column(String, nullable=False)
+    reason: Mapped[str] = mapped_column(String, nullable=True)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), nullable=False)
+    scan: Mapped[ScanEvent] = relationship("ScanEvent", back_populates="hosts")
+    addresses: Mapped[List["Address"]] = relationship(back_populates="host")
 
 
-# class Address(Base):
-#     """
-#     Address model for hosts. A Host can have many addresses.
-#     """
+class Address(Base):
+    """
+    Address model for hosts. A Host can have many addresses.
+    """
 
-#     __tablename__ = "address"
-#     address_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-#     host_id = Column(UUID(as_uuid=True), nullable=False)
-
-#     address = Column(String, nullable=False)
-#     address_type = Column(String, nullable=True)
-#     vendor = Column(String, nullable=True)
-#     created_at = Column(DateTime, default=func.now(), nullable=False)
+    __tablename__ = "address"
+    address_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    host_id: Mapped[str] = mapped_column(ForeignKey("host.host_id"))
+    address: Mapped[str] = mapped_column(String, nullable=False)
+    address_type: Mapped[str] = mapped_column(String, nullable=False)
+    vendor: Mapped[str] = mapped_column(String, nullable=True)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), nullable=False)
+    host: Mapped[Host] = relationship("Host", back_populates="addresses")
 
 
 # class HostName(Base):

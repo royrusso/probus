@@ -1,20 +1,22 @@
 from fastapi import APIRouter, Depends
 from backend.db import get_db
-from backend.schemas import ProfileRead
-from scan.nmap import NmapScanner
+from backend.schemas import ProfileOnlyRead
+from backend.service.profile_scan import ProfileScanService
+from service.nmap import NmapScanner
 from sqlalchemy.orm import Session
 
 router = APIRouter()
 
 
-@router.get("/scan/profile/{profile_id}", response_model=ProfileRead, tags=["scan"])
+@router.get("/scan/profile/{profile_id}", response_model=ProfileOnlyRead, tags=["scan"])
 async def scan_profile(profile_id: str, db: Session = Depends(get_db)):
     """
-    Scan the target profile .
+    Scan the target profile.
 
     """
-    nmap_scanner = NmapScanner()
-    profile = nmap_scanner.scan_profile(profile_id, db)
+    profile_service = ProfileScanService(profile_id, db)
+    profile = profile_service.scan_profile()
+
     return profile
 
 

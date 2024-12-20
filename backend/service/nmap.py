@@ -106,14 +106,16 @@ class NmapScanner(object):
                 case (
                     ScanTypesEnum.PING
                 ):  # No port scan. Yes traceroute sudo nmap -sn --traceroute -T4 -oX - -v 192.168.1.196
+                    # added 'unprivileged' flag to fix where nmap was showing all hosts as up, even though they weren't while running in docker.
                     flags = [
                         "-sn",
+                        "--unprivileged",
                         "-T4",
                         "-oX",
                         "-",
                     ]
                 case ScanTypesEnum.DETAILED:  # TCP SYN scan nmap -sS --min-rate 2000 -oX -
-                    flags = ["-sS", "-Pn", "--min-rate", "2000", "-oX", "-"]
+                    flags = ["-sS", "--min-rate", "2000", "-oX", "-"]
                 case ScanTypesEnum.OS:  # Enable OS detection only
                     flags = ["-sS", "-O", "--min-rate", "2000", "-oX", "-"]
                 case ScanTypesEnum.LIST:  # List scan sudo nmap -sL 192.168.1.200-210
@@ -135,7 +137,10 @@ class NmapScanner(object):
                 # To only show vulnerabilities within a certain range, add the following flag to the command where “x.x” is the CVSS score (ex: 6.5).
                 case _:
                     flags = []  # just use ping as the default.
-            command = [nmap_path] + flags + [self.target]
+            # command = [nmap_path] + flags + [self.target]
+            command = (
+                [nmap_path] + flags + self.target.split()
+            )  # this version works with a list of IPs concatenated with a space
             return command
         return None
 
@@ -227,7 +232,7 @@ class NmapScanner(object):
         logger.info("Running command: {}".format(" ".join(command)))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
-            stdout, stderr = process.communicate(timeout=30)  # TODO: timeout should be configurable
+            stdout, stderr = process.communicate(timeout=300)  # TODO: timeout should be configurable
             # logger.info("Scan Results: {}".format(stdout.decode("utf-8")))
             json_stdout_response = json.dumps(xmltodict.parse(stdout.decode("utf-8")), indent=4)
 
