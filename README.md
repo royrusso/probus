@@ -22,17 +22,18 @@ to network changes, new devices, open ports, and identifies CVEs
 
 ## Introduction
 
-Probus is a network scanner that identifies security vulnerabilities in your network and alerts you to new ones as they arise. Probus scans your network quickly using a combination of Nmap and a 3-pass scanning technique to identify hosts and open ports. It then uses the CVE database to identify vulnerabilities on a per-device basis.
+Probus is a network scanner that identifies security vulnerabilities in your network and alerts you to new ones as they arise. Probus scans your network quickly using a combination of Nmap and a 2-pass scanning technique to identify hosts and open ports.
 
-Probus is platform-agnostic - built with a FastAPI backend and a React frontend - available as a Docker container.
+Probus is platform-agnostic and available as a Docker container.
 
 ### Features:
 
-- **Network Scanner:** Scans your network for hosts and open ports.
+- **Network Scanner:** Asynchronously scans your network for hosts and open ports.
+- **Scheduled Scans:** Scans your network on a schedule.
 - **Vulnerability Scanner:** Identifies security vulnerabilities in your network on a per-device basis.
 - **Scan and Vulnerability History:** Keeps a history of scans and vulnerabilities identified.
 - **Alerting:** Alerts you to new vulnerabilities as they arise, new devices added to your network, given a network range.
-- **Platform agnostic**: (Windows, MacOS, Linux).
+- **Platform agnostic**: Avilable as a docker container.
 
 ## Installation
 

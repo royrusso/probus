@@ -1,4 +1,5 @@
 from datetime import datetime
+import traceback
 from loguru import logger
 from backend import models
 from sqlalchemy.orm import Session
@@ -25,10 +26,13 @@ class ProfileScanService(object):
         self.profile = profile
         return profile
 
-    def scan_profile(self):
+    async def scan_profile(self):
         """
+        An async method to scan the profile.
+
         This has to be done as a two-part scan. First we will scan using a ping scan to get the IP addresses of hosts that are "up"
         and then we will scan the IP addresses using "detailed" mode.
+        TODO: supposed custom scans defined in the profile.
         """
 
         profile = self.get_profile()
@@ -36,7 +40,7 @@ class ProfileScanService(object):
 
         scan_results = {}
         try:
-            ping_results = nmap_scanner.scan(
+            ping_results = await nmap_scanner.scan(
                 profile.ip_range, "ping"
             )  # TODO: make this configurable, because not all networks will need a two-step scan
             up_hosts = []
@@ -57,7 +61,7 @@ class ProfileScanService(object):
                 logger.info(f"Hosts that are up: {up_hosts}")
                 if len(up_hosts) > 0:
                     concat_ips: str = " ".join(up_hosts)
-                    scan_results = nmap_scanner.scan(concat_ips, "detailed")
+                    scan_results = await nmap_scanner.scan(concat_ips, "detailed")
                     if scan_results and "nmaprun" in scan_results:
 
                         nmap_parser = NMapParserService(scan_results, profile)
@@ -70,11 +74,7 @@ class ProfileScanService(object):
 
         except Exception as e:
             logger.error(f"Error scanning profile {self.profile_id}: {e}")
+            traceback.print_exc()
             return
 
-        # now let's scan the IP addresses that are "up"
-
         return profile
-
-    def __process_scan_results(self, scan_results: dict) -> models.Profile:
-        pass

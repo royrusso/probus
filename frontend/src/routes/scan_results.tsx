@@ -6,6 +6,8 @@ import {
   Container,
   OverlayTrigger,
   Row,
+  Toast,
+  ToastContainer,
 } from "react-bootstrap";
 import Tooltip from "react-bootstrap/Tooltip";
 import { IconContext } from "react-icons";
@@ -38,8 +40,23 @@ const ReRunSpinner = () => {
   );
 };
 
+const defaultReRunButtonContent = () => {
+  return (
+    <>
+      <IconContext.Provider value={{ className: "react-icon-button" }}>
+        <IoRefresh />
+      </IconContext.Provider>
+    </>
+  );
+};
+
 const ScanResults = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [showToast, setShowToast] = useState(false);
+  const [rerunButtonContent, setReRunButtonContent] = useState(
+    defaultReRunButtonContent
+  );
+
   const { profile_id } = useParams();
 
   if (!profile_id) {
@@ -54,32 +71,33 @@ const ScanResults = () => {
     });
   }, []);
 
-  const [isScanning, setIsScanning] = useState(false);
-
   const rerunScan = () => {
-    setIsScanning(true);
+    setShowToast(true);
 
-    // disable the rerun button
+    // disable the rerun button and replace it with a spinner
     const rerunButton = document.getElementById("rerun-scan");
     if (rerunButton) {
       rerunButton.setAttribute("disabled", "true");
+      setReRunButtonContent(() => {
+        return <ReRunSpinner />;
+      });
     }
 
     scanProfile(profile_id)
       .then((resp) => {
         console.log("Scan Result: ", resp);
 
-        setIsScanning(false);
+        setShowToast(false);
         rerunButton?.removeAttribute("disabled");
+        setReRunButtonContent(defaultReRunButtonContent);
 
         setProfile({ ...resp });
       })
       .catch((err) => {
         console.error("Error while scanning profile: ", err);
-        setIsScanning(false);
+        setShowToast(false);
         rerunButton?.removeAttribute("disabled");
-
-        // TODO: alert on error in UI
+        setReRunButtonContent(defaultReRunButtonContent);
       });
   };
 
@@ -97,12 +115,7 @@ const ScanResults = () => {
                   overlay={<Tooltip>Re-run this Profile</Tooltip>}
                 >
                   <Button onClick={rerunScan} id="rerun-scan">
-                    {isScanning ? <ReRunSpinner /> : null}
-                    <IconContext.Provider
-                      value={{ className: "react-icon-button" }}
-                    >
-                      <IoRefresh />
-                    </IconContext.Provider>
+                    {rerunButtonContent}
                   </Button>
                 </OverlayTrigger>
                 <OverlayTrigger overlay={<Tooltip>Edit this Profile</Tooltip>}>
@@ -149,6 +162,29 @@ const ScanResults = () => {
           </Row>
         </Container>
       )}
+      <ToastContainer
+        className="p-3"
+        position="middle-center"
+        style={{ zIndex: 1 }}
+      >
+        <Toast
+          onClose={() => setShowToast(false)}
+          show={showToast}
+          bg="dark"
+          delay={15000}
+          autohide
+        >
+          <Toast.Header>
+            <strong className="me-auto">Scan Running in the background</strong>
+          </Toast.Header>
+          <Toast.Body>
+            <p>
+              You may navigate away from this page and return later to view the
+              results.
+            </p>
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
     </>
   );
 };

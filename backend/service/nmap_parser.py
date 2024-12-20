@@ -1,7 +1,8 @@
+import traceback
 from typing import List
 
 from loguru import logger
-from backend.models import Address, Host, Profile, ScanEvent
+from backend.models import Address, Host, HostName, Port, Profile, ScanEvent
 
 
 class NMapParserService(object):
@@ -26,6 +27,9 @@ class NMapParserService(object):
         hosts: List[Host] = []
         host_list = self.scan_results["nmaprun"]["host"]
         for host in host_list:
+            if isinstance(host, str):
+                logger.warning(f"Host is a string: {host}")
+                continue
             try:
                 host_obj = Host()
                 host_obj.start_time = host.get("@starttime", None)
@@ -50,9 +54,47 @@ class NMapParserService(object):
                             host_address.address = addr["@addr"]
                             host_address.vendor = addr.get("@vendor", None)
                             host_obj.addresses.append(host_address)
+
+                hostname = host.get("hostnames", None)
+                if hostname:
+                    if isinstance(hostname, dict):
+                        host_name = HostName()
+                        host_name.host_name = hostname["hostname"]["@name"]
+                        host_name.host_type = hostname.get("hostname", {}).get("@type", None)
+                        host_obj.hostnames.append(host_name)
+                    elif isinstance(hostname, list):
+                        for hn in hostname:
+                            host_name = HostName()
+                            host_name.host_name = hn["hostname"]["@name"]
+                            host_name.host_type = hn.get("hostname", {}).get("@type", None)
+                            host_obj.hostnames.append(host_name)
+
+                ports = host.get("ports", None)
+                if ports:
+                    found_ports = ports.get("port", [])
+                    if found_ports:
+                        if isinstance(found_ports, list):
+                            for p in found_ports:
+                                port = Port()
+                                port.port_number = p["@portid"]
+                                port.protocol = p["@protocol"]
+                                port.state = p["state"]["@state"]
+                                port.reason = p["state"].get("@reason", None)
+                                port.service = p.get("service", {}).get("@name", None)
+                                host_obj.ports.append(port)
+                        elif isinstance(found_ports, dict):
+                            port = Port()
+                            port.port_number = found_ports["@portid"]
+                            port.protocol = found_ports["@protocol"]
+                            port.state = found_ports["state"]["@state"]
+                            port.reason = found_ports["state"].get("@reason", None)
+                            port.service = found_ports.get("service", {}).get("@name", None)
+                            host_obj.ports.append(port)
+
                 hosts.append(host_obj)
             except Exception as e:
                 logger.error(f"Error parsing host for profile {self.profile.profile_id}: {e}")
+                traceback.print_exc()
 
         scan_event.hosts = hosts
 

@@ -24,6 +24,12 @@ export const fetchProfileList = async () => {
   return data;
 };
 
+export const fetchLatestScannedProfiles = async (limit: number) => {
+  const response = await fetch(`${BASE_URI}/profiles/latest/${limit}`);
+  const data = await response.json();
+  return data;
+};
+
 export const updateProfile = async (profileId: string, profileData: any) => {
   const response = await fetch(`${BASE_URI}/profile/${profileId}`, {
     method: "PUT",

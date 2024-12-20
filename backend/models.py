@@ -41,6 +41,16 @@ class ScanEvent(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), nullable=False)
     profile: Mapped[Profile] = relationship("Profile", back_populates="scan_events")
     hosts: Mapped[List["Host"]] = relationship(back_populates="scan")
+    scan_stat: Mapped["ScanStat"] = relationship("ScanStat", back_populates="scan")
+
+
+class ScanStat(Base):
+    __tablename__ = "scan_stat"
+    scan_stat_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    scan_id: Mapped[int] = mapped_column(ForeignKey("scan.scan_id"))
+    up_hosts: Mapped[int] = mapped_column(Integer, nullable=False)
+    open_ports: Mapped[int] = mapped_column(Integer, nullable=False)
+    scan: Mapped[ScanEvent] = relationship("ScanEvent", back_populates="scan_stat")
 
 
 class Host(Base):
@@ -58,6 +68,8 @@ class Host(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), nullable=False)
     scan: Mapped[ScanEvent] = relationship("ScanEvent", back_populates="hosts")
     addresses: Mapped[List["Address"]] = relationship(back_populates="host")
+    hostnames: Mapped[List["HostName"]] = relationship(back_populates="host")
+    ports: Mapped[List["Port"]] = relationship(back_populates="host")
 
 
 class Address(Base):
@@ -75,35 +87,36 @@ class Address(Base):
     host: Mapped[Host] = relationship("Host", back_populates="addresses")
 
 
-# class HostName(Base):
-#     """
-#     HostName model
-#     """
+class HostName(Base):
+    """
+    HostName model
+    """
 
-#     __tablename__ = "hostname"
-#     hostname_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-#     host_id = Column(UUID(as_uuid=True), nullable=False)
+    __tablename__ = "hostname"
+    hostname_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    host_id: Mapped[str] = mapped_column(ForeignKey("host.host_id"))
+    host_name: Mapped[str] = mapped_column(String, nullable=False)
+    host_type: Mapped[str] = mapped_column(String, nullable=True)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), nullable=False)
+    host: Mapped[Host] = relationship("Host", back_populates="hostnames")
 
-#     host_name = Column(String, nullable=False)
-#     host_type = Column(String, nullable=True)
-#     created_at = Column(DateTime, default=func.now(), nullable=False)
 
+class Port(Base):
+    """
+    ScanPorts model
+    """
 
-# class ScanPorts(Base):
-#     """
-#     ScanPorts model
-#     """
+    __tablename__ = "port"
 
-#     __tablename__ = "scan_ports"
-#     scan_ports_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-#     host_id = Column(UUID(as_uuid=True), nullable=False)
-
-#     port_number = Column(SmallInteger, nullable=False)
-#     protocol = Column(String, nullable=True)
-#     state = Column(String, nullable=True)
-#     reason = Column(String, nullable=True)
-#     service = Column(String, nullable=True)
-#     created_at = Column(DateTime, default=func.now(), nullable=False)
+    port_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    host_id: Mapped[str] = mapped_column(ForeignKey("host.host_id"))
+    port_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    protocol: Mapped[str] = mapped_column(String, nullable=False)
+    state: Mapped[str] = mapped_column(String, nullable=False)
+    reason: Mapped[str] = mapped_column(String, nullable=True)
+    service: Mapped[str] = mapped_column(String, nullable=True)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), nullable=False)
+    host: Mapped[Host] = relationship("Host", back_populates="ports")
 
 
 # Sample JSON response from Nmap

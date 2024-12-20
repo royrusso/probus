@@ -5,6 +5,10 @@ from typing import List, Optional
 
 
 class ProfileOnlyRead(BaseModel):
+    """
+    A thin profile model that only includes the profile information and no child objects.
+    """
+
     profile_id: str
     profile_name: str
     profile_description: Optional[str] = None

@@ -1,14 +1,11 @@
 from enum import Enum
 import os
 import subprocess
-import uuid
 from loguru import logger
 import xmltodict
 import json
-from sqlalchemy.orm import Session
-from backend import models
 from .nmap_utils import is_root
-from datetime import datetime
+import asyncio
 
 
 class ScanTypesEnum(str, Enum):
@@ -21,7 +18,7 @@ class ScanTypesEnum(str, Enum):
 
 class NmapScanner(object):
     """
-    Nmap object to handle nmap scanning. This will be used to scan the target IP address(es) and return the results.
+    Async Nmap Scanner
 
     Speed is important, so this class will be used to scan multiple IP addresses in parallel. We will use the multiprocessing module to achieve this.
 
@@ -29,7 +26,6 @@ class NmapScanner(object):
 
     1. The first pass will be a simple ping scan to determine which hosts are up. "ping"
     2. The second pass will be a more detailed scan to determine the open ports and services. "detailed"
-    3. The third pass will be a vulnerability scan to determine which hosts are vulnerable. "vuln"
     """
 
     def __init__(self):
@@ -161,66 +157,16 @@ class NmapScanner(object):
         return self.__scan()
 
     @is_root
-    def scan_profile(self, profile_id: str, db: Session) -> str:
-        """
-        Given a profile ID, scan the target IP address(es), stores the results, and returns them.
-        """
-        profile = db.query(models.Profile).filter(models.Profile.profile_id == profile_id).first()
-        if not profile:
-            logger.error("Profile not found.")
-            return None
-
-        # get the target IP address(es) from the profile
-        self.target = profile.ip_range
-        self.scan_type = "detailed"
-        if not self.target or not self.scan_type:
-            logger.error("Target and scan type must be provided.")
-            return "Target and scan type must be provided."
-
-        try:
-            scan_result_json = self.__scan()
-
-            if scan_result_json:
-                profile.last_scan = datetime.now()
-
-                scan_event = models.ScanEvent(profile_id=profile.profile_id)
-                scan_event.scan_command = scan_result_json["nmaprun"]["@args"]
-                scan_event.scan_start = scan_result_json["nmaprun"]["@start"]
-                scan_event.scan_end = scan_result_json["nmaprun"]["runstats"]["finished"]["@time"]
-                scan_event.scan_status = scan_result_json["nmaprun"]["runstats"]["finished"]["@exit"]
-                scan_event.profile_id = profile.profile_id
-                scan_event.scan_id = str(uuid.uuid4())
-                scan_event.profile = profile
-                profile.scan_events.append(scan_event)
-
-                db.commit()
-
-        except Exception as e:
-            logger.error("Error: {}".format(e))
-            return None
-
-        return profile
-
-    @is_root
-    def scan(self, target: str, type: str) -> str:
-        # Rethinking this...
-        # if ("-" in target) or ("/" in target):
-        #     logger.error(
-        #         "Target {} must be a single IP address. Use list_scan instead.".format(
-        #             target
-        #         )
-        #     )
-        #     return "Target {} must be a single IP address.".format(target)
-
+    async def scan(self, target: str, type: str) -> str:
         self.target = target
         self.scan_type = type
         if not self.target or not self.scan_type:
             logger.error("Target and scan type must be provided.")
             return "Target and scan type must be provided."
-        return self.__scan()
+        return await self.__scan()
 
     @is_root
-    def __scan(self) -> str:
+    async def __scan(self) -> str:
         """
         Scan the target IP address(es)
         ::NOTE:: This requires root privs, so when running in VSCode Debugger, open the vscode terminal and type: `sudo su` and then run the debugger.
@@ -230,9 +176,15 @@ class NmapScanner(object):
 
         command = self.get_scan_command()
         logger.info("Running command: {}".format(" ".join(command)))
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = await asyncio.create_subprocess_exec(
+            *command,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        # process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
-            stdout, stderr = process.communicate(timeout=300)  # TODO: timeout should be configurable
+            stdout, stderr = await process.communicate()
+            # stdout, stderr = process.communicate(timeout=300)  # TODO: timeout should be configurable
             # logger.info("Scan Results: {}".format(stdout.decode("utf-8")))
             json_stdout_response = json.dumps(xmltodict.parse(stdout.decode("utf-8")), indent=4)
 

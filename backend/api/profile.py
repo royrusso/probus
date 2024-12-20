@@ -3,12 +3,12 @@ from fastapi import APIRouter, Depends, status
 from backend import models, schemas
 from backend.db import get_db
 from sqlalchemy.orm import Session
-from backend.schemas import ProfileRead
+from backend.schemas import ProfileOnlyRead
 
 router = APIRouter()
 
 
-@router.get("/profile/{profile_id}", response_model=ProfileRead, tags=["profile"])
+@router.get("/profile/{profile_id}", response_model=ProfileOnlyRead, tags=["profile"])
 def get_profile(profile_id: str, db: Session = Depends(get_db)):
     """
     Get a profile by ID.
@@ -18,16 +18,26 @@ def get_profile(profile_id: str, db: Session = Depends(get_db)):
     return profile
 
 
-@router.get("/profiles", response_model=list[ProfileRead], tags=["profile"])
+@router.get("/profiles/latest/{count}", response_model=list[ProfileOnlyRead], tags=["profile"])
+def get_profiles(count: int, db: Session = Depends(get_db)):
+    """
+    Get latest X profiles.
+    """
+    profiles = db.query(models.Profile).order_by(models.Profile.last_scan.desc()).limit(count).all()
+
+    return [ProfileOnlyRead.model_validate(profile) for profile in profiles]
+
+
+@router.get("/profiles/", response_model=list[ProfileOnlyRead], tags=["profile"])
 def get_profiles(db: Session = Depends(get_db)):
     """
     Get all profiles.
     """
     profiles = db.query(models.Profile).all()
-    return [ProfileRead.model_validate(profile) for profile in profiles]
+    return [ProfileOnlyRead.model_validate(profile) for profile in profiles]
 
 
-@router.post("/profile", response_model=ProfileRead, status_code=status.HTTP_201_CREATED, tags=["profile"])
+@router.post("/profile", response_model=ProfileOnlyRead, status_code=status.HTTP_201_CREATED, tags=["profile"])
 def create_profile(profile: schemas.ProfileBaseSchema, db: Session = Depends(get_db)):
     """
     Create a new profile.

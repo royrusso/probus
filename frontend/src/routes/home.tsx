@@ -1,5 +1,5 @@
 import { generateSlug } from "random-word-slugs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Button,
@@ -9,10 +9,41 @@ import {
   InputGroup,
   Row,
 } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { createProfile } from "../services/Client";
+import { NavigateFunction, useNavigate } from "react-router-dom";
+import { createProfile, fetchLatestScannedProfiles } from "../services/Client";
 import { Profile } from "../types/probus";
 import { isValidIPv4Range } from "../utils/IPUtils";
+import formatDateTime from "../utils/Tools";
+
+const generateProfileCards = (
+  profiles: Profile[],
+  navigate: NavigateFunction
+) => {
+  return profiles.map((profile) => {
+    return (
+      <Col key={profile.profile_id} className="mb-3">
+        <Alert variant="info">
+          <div className="text-center">
+            <h5>{profile.profile_name}</h5>
+            <div className="profile-card-details">
+              {formatDateTime(profile.last_scan ?? "")}
+            </div>
+            <div className="profile-card-details">{profile.ip_range}</div>
+          </div>
+          <div className="text-end small mt-2">
+            <Button
+              variant="outline-info"
+              size="sm"
+              onClick={() => navigate("/results/" + profile.profile_id)}
+            >
+              Results
+            </Button>
+          </div>
+        </Alert>
+      </Col>
+    );
+  });
+};
 
 const Home = () => {
   const navigate = useNavigate();
@@ -20,8 +51,23 @@ const Home = () => {
     ipAddress: "",
   });
   const [validIP, setValidIP] = useState(true);
-  // const [showToast, setShowToast] = useState(false);
-  // const [scanFormToastMessage, setScanFormToastMessage] = useState("");
+  const [profileCards, setProfileCards] = useState<JSX.Element[]>([]);
+
+  const fetchLast5Profiles = () => {
+    const result = fetchLatestScannedProfiles(5);
+    result.then((resp) => {
+      console.log("Latest 5 Profiles: ", resp);
+
+      // Generate the profile cards
+      const cards = generateProfileCards(resp, navigate);
+      setProfileCards(cards);
+      console.log("Profile Cards: ", profileCards);
+    });
+  };
+
+  useEffect(() => {
+    fetchLast5Profiles();
+  }, []);
 
   const handleChange = (e: { target: { id: any; value: any } }) => {
     const { id, value } = e.target;
@@ -51,9 +97,7 @@ const Home = () => {
 
     result.then((resp) => {
       console.log("Profile Created: ", resp);
-      navigate("/results/" + resp.profile_id, {
-        state: { data: resp },
-      });
+      navigate("/results/" + resp.profile_id);
     });
   };
 
@@ -61,9 +105,9 @@ const Home = () => {
     <>
       <Container
         fluid
-        className="vh-100 d-flex justify-content-center align-items-center"
+        className="d-flex justify-content-center align-items-center"
       >
-        <Row className="w-50">
+        <Row className="w-50 mt-5">
           <Col className="mb-5">
             <Form className="w-100 mb-5" onSubmit={handleSubmit} noValidate>
               <Alert variant="secondary">
@@ -91,23 +135,24 @@ const Home = () => {
                 </Form.Text>
               </Alert>
             </Form>
-
-            {/* <Toast
-              bg="success"
-              delay={5000}
-              autohide
-              show={showToast}
-              onClose={() => setShowToast(false)}
-              style={{ position: "absolute", top: 20, right: 20 }}
-            >
-              <Toast.Header>
-                <strong className="me-auto">Scan Started</strong>
-              </Toast.Header>
-              <Toast.Body>{scanFormToastMessage}</Toast.Body>
-            </Toast> */}
           </Col>
         </Row>
       </Container>
+      {profileCards.length > 0 && ( // Display the latest scans only if there are any}
+        <Container className="mt-1">
+          <Row>
+            <Col>
+              <h3>
+                Latest Scans{" "}
+                <div className="inline-small">
+                  [ <a href="/profiles">View All</a>]
+                </div>
+              </h3>
+            </Col>
+          </Row>
+          <Row>{profileCards}</Row>
+        </Container>
+      )}{" "}
     </>
   );
 };

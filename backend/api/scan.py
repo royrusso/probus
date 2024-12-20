@@ -15,7 +15,7 @@ async def scan_profile(profile_id: str, db: Session = Depends(get_db)):
 
     """
     profile_service = ProfileScanService(profile_id, db)
-    profile = profile_service.scan_profile()
+    profile = await profile_service.scan_profile()
 
     return profile
 
