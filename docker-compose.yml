@@ -1,25 +1,22 @@
 services:
   backend:
     build:
-      context: ./
-      dockerfile: Dockerfile-backend
+      context: .
+      dockerfile: docker/Dockerfile-backend
     ports:
       - "8000:8000"
     privileged: true
     user: root
-  #   volumes:
-  #     - ./backend:/app
-  #   # depends_on:
-  #   #   - db
+    network_mode: bridge #TODO: make configurable for linux to use host mode.
   frontend:
     build:
-      context: ./
-      dockerfile: Dockerfile-frontend
+      context: .
+      dockerfile: docker/Dockerfile-frontend
     ports:
       - "8080:8080"
-    # volumes:
-    #   - ./frontend:/app
-    # stdin_open: true
-    # tty: true
-    # depends_on:
-    #   - backend
+  # volumes:
+  #   - ./frontend:/app
+  # stdin_open: true
+  # tty: true
+  # depends_on:
+  #   - backend

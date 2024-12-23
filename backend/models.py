@@ -36,6 +36,7 @@ class ProfileSetting(Base):
     setting_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     profile_id: Mapped[str] = mapped_column(ForeignKey("profile.profile_id"))
     ping_network_first = mapped_column(Boolean, nullable=False, default=True)
+    ignore_anonymous_hosts = mapped_column(Boolean, nullable=False, default=True)
     nmap_timeout_in_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=300)
     nmap_min_rate: Mapped[int] = mapped_column(Integer, nullable=False, default=2000)
     nmap_query_os = mapped_column(Boolean, nullable=False, default=False)

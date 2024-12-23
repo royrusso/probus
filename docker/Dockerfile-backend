@@ -13,7 +13,12 @@ RUN apt-get update && \
     apt-get install -y nmap && \
     apt-get clean    
 
-COPY /backend/requirements.txt requirements.txt
+# Install ping
+# RUN apt-get update && \
+#     apt-get install -y iputils-ping && \
+#     apt-get clean
+
+COPY backend/requirements.txt requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt
 
