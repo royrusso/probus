@@ -1,11 +1,11 @@
 from datetime import datetime
 import traceback
 from loguru import logger
-from backend import models
 from sqlalchemy.orm import Session
 
 from backend.service.nmap import NmapScanner
 from backend.service.nmap_parser import NMapParserService
+from backend.service.persistence import db_profile
 
 
 class ProfileScanService(object):
@@ -17,15 +17,6 @@ class ProfileScanService(object):
         self.profile_id = profile_id
         self.db = db
 
-    def get_profile(self):
-        profile = self.db.query(models.Profile).filter(models.Profile.profile_id == self.profile_id).first()
-        if not profile:
-            logger.error("Profile not found.")
-            return None
-
-        self.profile = profile
-        return profile
-
     async def scan_profile(self):
         """
         An async method to scan the profile.
@@ -35,7 +26,7 @@ class ProfileScanService(object):
         TODO: supposed custom scans defined in the profile.
         """
 
-        profile = self.get_profile()
+        profile = db_profile.get_profile(self.profile_id, self.db)
         nmap_scanner = NmapScanner()
 
         scan_results = {}
@@ -69,8 +60,7 @@ class ProfileScanService(object):
                         scan_event = nmap_parser.build_scan_event_from_results()
                         profile.scan_events.append(scan_event)
                         profile.last_scan = datetime.now()
-                        self.db.add(profile)
-                        self.db.commit()
+                        db_profile.save_profile(profile, self.db)
 
         except Exception as e:
             logger.error(f"Error scanning profile {self.profile_id}: {e}")

@@ -1,9 +1,11 @@
 import uuid
 from fastapi import APIRouter, Depends, status
-from backend import models, schemas
+from backend import models
 from backend.db import get_db
 from sqlalchemy.orm import Session
-from backend.schemas import ProfileOnlyRead
+from backend.schemas import ProfileBase, ProfileOnlyRead
+from backend.service.persistence import db_profile
+from backend.service.profile_scan import ProfileScanService
 
 router = APIRouter()
 
@@ -14,14 +16,26 @@ def get_profile(profile_id: str, db: Session = Depends(get_db)):
     Get a profile by ID.
     """
 
-    profile = db.query(models.Profile).filter(models.Profile.profile_id == profile_id).first()
+    profile = db_profile.get_profile(profile_id, db)
+    return profile
+
+
+@router.get("/profile/{profile_id}/scan", response_model=ProfileOnlyRead, tags=["profile"])
+async def scan_profile(profile_id: str, db: Session = Depends(get_db)):
+    """
+    Scan the target profile.
+
+    """
+    profile_service = ProfileScanService(profile_id, db)
+    profile = await profile_service.scan_profile()
+
     return profile
 
 
 @router.get("/profiles/latest/{count}", response_model=list[ProfileOnlyRead], tags=["profile"])
 def get_profiles(count: int, db: Session = Depends(get_db)):
     """
-    Get latest X profiles.
+    Get latest profiles, using `latest_scan` as a sort.
     """
     profiles = db.query(models.Profile).order_by(models.Profile.last_scan.desc()).limit(count).all()
 
@@ -38,7 +52,7 @@ def get_profiles(db: Session = Depends(get_db)):
 
 
 @router.post("/profile", response_model=ProfileOnlyRead, status_code=status.HTTP_201_CREATED, tags=["profile"])
-def create_profile(profile: schemas.ProfileBaseSchema, db: Session = Depends(get_db)):
+def create_profile(profile: ProfileBase, db: Session = Depends(get_db)):
     """
     Create a new profile.
     """
@@ -51,7 +65,7 @@ def create_profile(profile: schemas.ProfileBaseSchema, db: Session = Depends(get
 
 
 @router.patch("/profile/{profile_id}", tags=["profile"])
-def update_profile(profile_id: str, profile: schemas.ProfileBaseSchema, db: Session = Depends(get_db)):
+def update_profile(profile_id: str, profile: ProfileBase, db: Session = Depends(get_db)):
     """
     Update a profile by ID.
     """

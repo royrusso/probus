@@ -50,7 +50,7 @@ const Profiles = () => {
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 5,
+    pageSize: 10,
   });
 
   const columnHelper = createColumnHelper<Profile>();
@@ -108,11 +108,7 @@ const Profiles = () => {
     }),
     columnHelper.accessor("created_at", {
       cell: (profile) => formatDateTime(profile.getValue()),
-      header: () => <span>Created At</span>,
-    }),
-    columnHelper.accessor("updated_at", {
-      cell: (profile) => formatDateTime(profile.getValue()),
-      header: () => <span>Updated At</span>,
+      header: () => <span>Created</span>,
     }),
   ];
   const profilesTable = useReactTable({

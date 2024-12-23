@@ -23,6 +23,7 @@ class NMapParserService(object):
         scan_event.scan_start = self.scan_results["nmaprun"]["@start"]
         scan_event.scan_end = self.scan_results["nmaprun"]["runstats"]["finished"]["@time"]
         scan_event.scan_status = self.scan_results["nmaprun"]["runstats"]["finished"]["@exit"]
+        scan_event.scan_summary = self.scan_results["nmaprun"]["runstats"]["finished"]["@summary"]
 
         hosts: List[Host] = []
         host_list = self.scan_results["nmaprun"]["host"]
@@ -38,6 +39,7 @@ class NMapParserService(object):
                 if host_status:
                     host_obj.state = host_status.get("@state", None)
                     host_obj.reason = host_status.get("@reason", None)
+                host_obj.latency = host.get("times", {}).get("@srtt", None)
 
                 address = host["address"]
                 if address:

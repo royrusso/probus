@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  Alert,
   Button,
   ButtonGroup,
   Col,
@@ -14,7 +15,11 @@ import { IconContext } from "react-icons";
 import { FaListUl, FaRegEdit } from "react-icons/fa";
 import { IoRefresh } from "react-icons/io5";
 import { useParams } from "react-router-dom";
-import { fetchProfile, scanProfile } from "../services/Client";
+import {
+  fetchLatestScanEvent,
+  fetchProfile,
+  scanProfile,
+} from "../services/Client";
 import { Profile } from "../types/probus";
 import formatDateTime from "../utils/Tools";
 
@@ -52,6 +57,7 @@ const defaultReRunButtonContent = () => {
 
 const ScanResults = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [scanResults, setScanResults] = useState<any | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [rerunButtonContent, setReRunButtonContent] = useState(
     defaultReRunButtonContent
@@ -68,6 +74,13 @@ const ScanResults = () => {
     fetchProfile(profile_id).then((resp) => {
       console.log("Profile Data: ", resp);
       setProfile(resp);
+
+      if (resp.last_scan) {
+        fetchLatestScanEvent(profile_id).then((resp) => {
+          console.log("Latest Scan Event: ", resp);
+          setScanResults(resp);
+        });
+      }
     });
   }, []);
 
@@ -85,13 +98,18 @@ const ScanResults = () => {
 
     scanProfile(profile_id)
       .then((resp) => {
-        console.log("Scan Result: ", resp);
+        console.log("Profile Result: ", resp);
 
         setShowToast(false);
         rerunButton?.removeAttribute("disabled");
         setReRunButtonContent(defaultReRunButtonContent);
 
         setProfile({ ...resp });
+
+        fetchLatestScanEvent(profile_id).then((resp) => {
+          console.log("Latest Scan Event: ", resp);
+          setScanResults(resp);
+        });
       })
       .catch((err) => {
         console.error("Error while scanning profile: ", err);
@@ -148,6 +166,37 @@ const ScanResults = () => {
             <Col className="text-end">
               <LatestScan profile={profile} />
             </Col>
+          </Row>
+          <Row>
+            {profile.last_scan === null ? (
+              <Col className="mt-5">
+                <Alert variant="warning">
+                  <div className="text-center">
+                    <h5>No scan results available</h5>
+                    <div className="text-muted">
+                      You may trigger a scan of the network. This page will
+                      refresh automatically when the scan is complete.
+                    </div>
+                    <div className="text-muted small">
+                      This process may take a few minutes to complete.
+                    </div>
+                  </div>
+                  <div className="text-center mt-2">
+                    <Button
+                      variant="warning"
+                      size="sm"
+                      onClick={() => rerunScan()}
+                    >
+                      Scan Network
+                    </Button>
+                  </div>
+                </Alert>
+              </Col>
+            ) : (
+              <Col>
+                <h3>Scan Results</h3>
+              </Col>
+            )}
           </Row>
         </Container>
       ) : (

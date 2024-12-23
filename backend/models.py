@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import List
-from sqlalchemy import DateTime, Integer, String
+from sqlalchemy import Boolean, DateTime, Integer, String
 from db import Base
 from sqlalchemy.sql import func
 from sqlalchemy import String, ForeignKey
@@ -24,6 +24,24 @@ class Profile(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), nullable=False)
     updated_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
     scan_events: Mapped[List["ScanEvent"]] = relationship(back_populates="profile", lazy="dynamic")
+    settings: Mapped["ProfileSetting"] = relationship("ProfileSetting", back_populates="profile")
+
+
+class ProfileSetting(Base):
+    """
+    ProfileProperty model
+    """
+
+    __tablename__ = "profile_settings"
+    setting_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    profile_id: Mapped[str] = mapped_column(ForeignKey("profile.profile_id"))
+    ping_network_first = mapped_column(Boolean, nullable=False, default=True)
+    nmap_timeout_in_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=300)
+    nmap_min_rate: Mapped[int] = mapped_column(Integer, nullable=False, default=2000)
+    nmap_query_os = mapped_column(Boolean, nullable=False, default=False)
+    nmap_perform_vuln_scan = mapped_column(Boolean, nullable=False, default=False)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), nullable=False)
+    profile: Mapped[Profile] = relationship("Profile", back_populates="settings")
 
 
 class ScanEvent(Base):
@@ -38,6 +56,7 @@ class ScanEvent(Base):
     scan_start: Mapped[int] = mapped_column(Integer, nullable=False)
     scan_end: Mapped[int] = mapped_column(Integer, nullable=False)
     scan_status: Mapped[str] = mapped_column(String, nullable=False)
+    scan_summary: Mapped[str] = mapped_column(String, nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), nullable=False)
     profile: Mapped[Profile] = relationship("Profile", back_populates="scan_events")
     hosts: Mapped[List["Host"]] = relationship(back_populates="scan")
@@ -65,6 +84,7 @@ class Host(Base):
     end_time: Mapped[int] = mapped_column(Integer, nullable=False)
     state: Mapped[str] = mapped_column(String, nullable=False)
     reason: Mapped[str] = mapped_column(String, nullable=True)
+    latency: Mapped[int] = mapped_column(Integer, nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), nullable=False)
     scan: Mapped[ScanEvent] = relationship("ScanEvent", back_populates="hosts")
     addresses: Mapped[List["Address"]] = relationship(back_populates="host")

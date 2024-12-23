@@ -1,6 +1,7 @@
 from enum import Enum
 import os
 import subprocess
+import traceback
 from loguru import logger
 import xmltodict
 import json
@@ -177,13 +178,14 @@ class NmapScanner(object):
         command = self.get_scan_command()
         logger.info("Running command: {}".format(" ".join(command)))
         process = await asyncio.create_subprocess_exec(
-            *command,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
+            *command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
         )
         # process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
-            stdout, stderr = await process.communicate()
+            stdout, stderr = await asyncio.wait_for(
+                process.communicate(), timeout=300
+            )  # TODO: timeout should be configurable
+            # stdout, stderr = await process.communicate()
             # stdout, stderr = process.communicate(timeout=300)  # TODO: timeout should be configurable
             # logger.info("Scan Results: {}".format(stdout.decode("utf-8")))
             json_stdout_response = json.dumps(xmltodict.parse(stdout.decode("utf-8")), indent=4)
@@ -192,12 +194,14 @@ class NmapScanner(object):
             if stderr:
                 logger.error("Scan Errors: {}".format(stderr.decode("utf-8")))
             return json.loads(json_stdout_response)
-        except subprocess.TimeoutExpired:
+        except asyncio.TimeoutError:
             process.kill()
             logger.error("Scan timed out for target: {}".format(self.target))
+            traceback.print_exc()
             return None
         except Exception as e:
             logger.error("Error: {}".format(e))
+            traceback.print_exc()
             return None
 
 

@@ -21,7 +21,7 @@ const generateProfileCards = (
 ) => {
   return profiles.map((profile) => {
     return (
-      <Col key={profile.profile_id} className="mb-3">
+      <Col key={profile.profile_id} className="mb-3" xs={6} md={4} lg={4}>
         <Alert variant="info">
           <div className="text-center">
             <h5>{profile.profile_name}</h5>
@@ -54,9 +54,9 @@ const Home = () => {
   const [profileCards, setProfileCards] = useState<JSX.Element[]>([]);
 
   const fetchLast5Profiles = () => {
-    const result = fetchLatestScannedProfiles(5);
+    const result = fetchLatestScannedProfiles(3);
     result.then((resp) => {
-      console.log("Latest 5 Profiles: ", resp);
+      console.log("Latest Profiles: ", resp);
 
       // Generate the profile cards
       const cards = generateProfileCards(resp, navigate);
@@ -114,7 +114,7 @@ const Home = () => {
                 {" "}
                 <InputGroup>
                   <Form.Control
-                    placeholder="Enter IP Address or Range to begin scanning..."
+                    placeholder="Enter IP Address/Range to create a new scan profile..."
                     type="text"
                     id="ipAddress"
                     onChange={handleChange}
