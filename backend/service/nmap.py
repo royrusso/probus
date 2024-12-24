@@ -102,19 +102,20 @@ class NmapScanner(object):
             match self.scan_type:
                 case (
                     ScanTypesEnum.PING
-                ):  # No port scan. Yes traceroute sudo nmap -sn --unprivileged -T4 -oX - 192.168.1.0-255
-                    # nmap -sn -oX - 192.168.50.0-255
-                    # nmap -sn -T4 -oX - 192.168.20.0-100
-                    # added 'unprivileged' flag to fix where nmap was showing all hosts as up, even though they weren't while running in docker.
+                ):  # No port scan. Yes traceroute sudo nmap -sn --unprivileged -T4 -oX - 192.168.1.0-100
+                    # nmap -sn --unprivileged -T4 192.168.1.0-100
+                    # nmap -sn --unprivileged -T4 -oX - 192.168.50.0-255
                     flags = [
                         "-sn",
-                        # "--unprivileged", # this seemed to cause a lot of slowness in the docker scans
+                        "--unprivileged",
                         "-T4",
                         "-oX",
                         "-",
                     ]
-                case ScanTypesEnum.DETAILED:  # TCP SYN scan nmap -sS --min-rate 2000 -oX -
-                    flags = ["-sS", "--top-ports", "1000", "--min-rate", "2000", "-oX", "-"]
+                case ScanTypesEnum.DETAILED:
+                    # TCP SYN scan nmap -sS --min-rate 2000 -oX - 192.168.1.0-100
+                    # nmap -sS --min-rate 2000 --unprivileged -oX - 192.168.1.0-10
+                    flags = ["-sS", "--min-rate", "2000", "-oX", "-"]
                 case ScanTypesEnum.OS:  # Enable OS detection only
                     flags = ["-sS", "-O", "--min-rate", "2000", "-oX", "-"]
                 case ScanTypesEnum.LIST:  # List scan sudo nmap -sL 192.168.1.200-210
