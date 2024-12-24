@@ -5,7 +5,7 @@ services:
       dockerfile: docker/Dockerfile-backend
     ports:
       - "8000:8000"
-    privileged: true
+    #privileged: true
     user: root
     network_mode: bridge #TODO: make configurable for linux to use host mode.
   frontend:

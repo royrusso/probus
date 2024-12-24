@@ -102,17 +102,19 @@ class NmapScanner(object):
             match self.scan_type:
                 case (
                     ScanTypesEnum.PING
-                ):  # No port scan. Yes traceroute sudo nmap -sn --traceroute -T4 -oX - -v 192.168.1.196
+                ):  # No port scan. Yes traceroute sudo nmap -sn --unprivileged -T4 -oX - 192.168.1.0-255
+                    # nmap -sn -oX - 192.168.50.0-255
+                    # nmap -sn -T4 -oX - 192.168.20.0-100
                     # added 'unprivileged' flag to fix where nmap was showing all hosts as up, even though they weren't while running in docker.
                     flags = [
                         "-sn",
-                        "--unprivileged",
+                        # "--unprivileged", # this seemed to cause a lot of slowness in the docker scans
                         "-T4",
                         "-oX",
                         "-",
                     ]
                 case ScanTypesEnum.DETAILED:  # TCP SYN scan nmap -sS --min-rate 2000 -oX -
-                    flags = ["-sS", "--min-rate", "2000", "-oX", "-"]
+                    flags = ["-sS", "--top-ports", "1000", "--min-rate", "2000", "-oX", "-"]
                 case ScanTypesEnum.OS:  # Enable OS detection only
                     flags = ["-sS", "-O", "--min-rate", "2000", "-oX", "-"]
                 case ScanTypesEnum.LIST:  # List scan sudo nmap -sL 192.168.1.200-210
@@ -183,11 +185,11 @@ class NmapScanner(object):
         # process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
             stdout, stderr = await asyncio.wait_for(
-                process.communicate(), timeout=300
+                process.communicate(), timeout=600
             )  # TODO: timeout should be configurable
             # stdout, stderr = await process.communicate()
             # stdout, stderr = process.communicate(timeout=300)  # TODO: timeout should be configurable
-            # logger.info("Scan Results: {}".format(stdout.decode("utf-8")))
+            logger.info("NMap XML Results: {}".format(stdout.decode("utf-8")))
             json_stdout_response = json.dumps(xmltodict.parse(stdout.decode("utf-8")), indent=4)
 
             logger.info("Scan Results: {}".format(json_stdout_response))

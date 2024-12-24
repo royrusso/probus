@@ -37,9 +37,24 @@ class ProfileScanService(object):
             up_hosts = []
             if ping_results:
 
-                nmap_hosts = ping_results["nmaprun"]["host"]
+                nmap_hosts = ping_results["nmaprun"].get("host", [])
+
+                if (nmap_hosts is None) or (len(nmap_hosts) == 0):
+                    logger.error(f"No hosts found in ping scan for profile {self.profile_id}")
+                    return
+
                 for host in nmap_hosts:
                     if host["status"]["@state"] == "up":
+                        # we need to ignore hosts that have no hostname
+                        hostnames = host.get("hostnames", None)
+                        if isinstance(hostnames, dict):
+                            hostnames = [hostnames]
+                        elif isinstance(hostnames, list):
+                            hostnames = hostnames
+
+                        if hostnames is None or len(hostnames) == 0:
+                            continue
+
                         address = host["address"]  # address can be a dict or a list
                         if isinstance(address, dict):
                             if address["@addrtype"] == "ipv4":  # TODO: handle ipv6
