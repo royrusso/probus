@@ -10,7 +10,7 @@
 
 A network scanner with an attractive UI, that identifies security vulnerabilities in your network and alerts you to new ones as they arise. Scans are performed on a schedule or on-demand.
 
-[Introduction](#bulb-introduction) _ [Key Features](#dart-key-features) _ [Quickstart](#zap-quickstart) _ [Development](#dizzy-development) _ [Contributing](#+1-contributing) \* [Contact](#incoming_envelope-contact)
+[Introduction](#bulb-introduction) \* [Key Features](#dart-key-features) \* [Quickstart](#zap-quickstart) \* [Development](#dizzy-development) \* [Contributing](#+1-contributing) \* [Contact](#incoming_envelope-contact)
 
 </div>
 
