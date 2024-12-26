@@ -25,7 +25,7 @@ const Header = () => {
           >
             <Nav className="me-auto">
               <Nav.Link href="/">New Scan</Nav.Link>
-              <Nav.Link href="/profiles">Profiles</Nav.Link>
+              <Nav.Link href="/list_profiles">Profiles</Nav.Link>
             </Nav>
             <Nav className="justify-content-end">
               <Nav.Link href="/settings">

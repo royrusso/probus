@@ -45,7 +45,6 @@ app.include_router(nmap.router)
 app.include_router(info.router)
 app.include_router(default.router)
 
-
 app.openapi = probus_openapi_schema
 
 # TODO: We should disable this and reverse proxy through the UI's dev server.
@@ -57,6 +56,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+### BEGIN: attempt to serve the frontend via FastAPI so we only have one Docker container
+# Fails on serving non-cached assets? Fails on refreshing the page
+# class SPAStaticFiles(StaticFiles):
+#     async def get_response(self, path: str, scope):
+#         response = await super().get_response(path, scope)
+#         if response.status_code == 404:
+#             response = await super().get_response(".", scope)
+#         return response
+# app.mount("/", SPAStaticFiles(directory="frontend/dist", html=True), name="frontend")
+## END
+
 
 if __name__ == "__main__":
     """

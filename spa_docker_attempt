@@ -1,0 +1,62 @@
+### An attempt at serving the frontend and backend from the same container
+
+# Build for Vite frontend
+FROM node:23.0.0-alpine AS frontend-builder
+
+WORKDIR /app/frontend
+
+# Copy package.json and package-lock.json to install dependencies
+COPY /frontend/package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
+COPY /frontend/. .
+
+# Build the application for production
+RUN npm run build
+
+#EXPOSE 8080
+
+#CMD ["npm", "run", "start", "--", "--host"]
+
+# Build for FastAPI backend
+FROM python:3.13-slim
+
+WORKDIR /app
+
+# Install gcc and other necessary tools
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install nmap
+RUN apt-get update && \
+    apt-get install -y nmap && \
+    apt-get clean    
+
+# Install ping
+RUN apt-get update && \
+    apt-get install -y iputils-ping && \
+    apt-get clean
+
+COPY backend/requirements.txt requirements.txt
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code
+COPY . .
+
+EXPOSE 8000
+
+# Run as root for nmap calls.
+USER root
+
+# Copy frontend build to backend
+COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
+
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+

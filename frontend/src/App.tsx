@@ -12,7 +12,7 @@ const App = () => {
         <Routes>
           <Route index element={<Home />} />
           <Route path="/results/:profile_id" element={<ScanResults />} />
-          <Route path="/profiles" element={<Profiles />} />
+          <Route path="/list_profiles" element={<Profiles />} />
         </Routes>
       </main>
     </>

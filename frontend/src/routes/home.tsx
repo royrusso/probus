@@ -145,7 +145,7 @@ const Home = () => {
               <h3>
                 Latest Scans{" "}
                 <div className="inline-small">
-                  [ <a href="/profiles">View All</a>]
+                  [ <a href="/list_profiles">View All</a>]
                 </div>
               </h3>
             </Col>

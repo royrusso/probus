@@ -2,15 +2,15 @@ services:
   backend:
     build:
       context: .
-      dockerfile: docker/Dockerfile-backend
+      dockerfile: docker/backend.Dockerfile
     ports:
       - "8000:8000"
     privileged: true
-    #user: root
-    #network_mode: bridge #TODO: make configurable for linux to use host mode.
+    user: root
+    network_mode: ${NETWORK_MODE:-host}
   frontend:
     build:
       context: .
-      dockerfile: docker/Dockerfile-frontend
+      dockerfile: docker/frontend.Dockerfile
     ports:
       - "8080:8080"
