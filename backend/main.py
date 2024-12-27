@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from api import default, info, profile
+from api import info, profile
 from loguru import logger
 from backend.api import nmap, scan_event
 from db import engine
@@ -43,7 +43,6 @@ app.include_router(profile.router)
 app.include_router(scan_event.router)
 app.include_router(nmap.router)
 app.include_router(info.router)
-app.include_router(default.router)
 
 app.openapi = probus_openapi_schema
 

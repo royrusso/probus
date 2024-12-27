@@ -29,8 +29,12 @@ class ProfileBase(BaseModel):
     profile_id: str | None = None
     profile_name: str
     ip_range: str
+    last_scan: Optional[datetime] = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
+
+    class Config:
+        from_attributes = True
 
 
 class ScanEventRead(BaseModel):

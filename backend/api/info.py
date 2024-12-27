@@ -24,7 +24,7 @@ def which_nmap():
     nmap_version = scanner.nmap_version()
     which_nmap = scanner.which_nmap()
 
-    return {"nmap_version": nmap_version, "namp_path": which_nmap}
+    return {"nmap_version": nmap_version, "nmap_path": which_nmap}
 
 
 @router.get("/info/is_root", tags=["info"])

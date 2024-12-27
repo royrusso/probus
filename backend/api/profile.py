@@ -33,11 +33,11 @@ async def scan_profile(profile_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/profiles/latest/{count}", response_model=list[ProfileOnlyRead], tags=["profile"])
-def get_profiles(count: int, db: Session = Depends(get_db)):
+def get_profiles_latest(count: int, db: Session = Depends(get_db)):
     """
     Get latest profiles, using `latest_scan` as a sort.
     """
-    profiles = db.query(models.Profile).order_by(models.Profile.last_scan.desc()).limit(count).all()
+    profiles = db_profile.get_profiles_latest(count, db)
 
     return [ProfileOnlyRead.model_validate(profile) for profile in profiles]
 
@@ -47,7 +47,7 @@ def get_profiles(db: Session = Depends(get_db)):
     """
     Get all profiles.
     """
-    profiles = db.query(models.Profile).all()
+    profiles = db_profile.get_profiles(db)
     return [ProfileOnlyRead.model_validate(profile) for profile in profiles]
 
 
