@@ -205,7 +205,7 @@ const Profiles = () => {
                       </tr>
                     ))}
                   </tbody>
-                  <tfoot>
+                  {/* <tfoot>
                     {profilesTable.getFooterGroups().map((footerGroup) => (
                       <tr key={footerGroup.id}>
                         {footerGroup.headers.map((header) => (
@@ -220,7 +220,7 @@ const Profiles = () => {
                         ))}
                       </tr>
                     ))}
-                  </tfoot>
+                  </tfoot> */}
                 </BTable>
               </div>
             </Col>
